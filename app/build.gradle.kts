@@ -16,8 +16,6 @@ android {
         targetSdk = AppConfig.targetSdk
         versionCode = AppConfig.versionCode
         versionName = AppConfig.versionName
-
-        testInstrumentationRunner = AppConfig.testInstrumentationRunner
     }
     //签名类型
     signingConfigs{

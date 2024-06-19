@@ -8,21 +8,20 @@ object AppConfig{
     const val compileSdk=34
     const val versionCode=1
     const val versionName="1.0"
-
     const val applicationId="com.example.aivoiceapplication"
     const val namespace= applicationId
     const val testInstrumentationRunner="androidx.test.runner.AndroidJUnitRunner"
-
     const val keyPassword="123456"
     const val keyAlias="key0"
     const val storePassword="123456"
     const val storeFileUrl="/src/main/jks/aivoice.jks"
-
 }
 //Module配置
 object ModuleConfig{
     //是否App
-    var isApp=true
+    var isApp=false
+    //编译工具版本
+    const val buildToolsVersion = "34.0.0"
     //包名
     const val MODULE_APP_MANAGER="com.example.module_app_manager"
     const val MODULE_CONSTELLATION="com.example.module_constellation"

@@ -11,13 +11,13 @@ plugins {
 android {
     namespace = "com.example.module_app_manager"
     compileSdk = 34
-
+    buildToolsVersion=ModuleConfig.buildToolsVersion
     defaultConfig {
-        if (ModuleConfig.isApp){
-            applicationId=ModuleConfig.MODULE_APP_MANAGER
-        }
+//        if (ModuleConfig.isApp){
+//            applicationId=ModuleConfig.MODULE_APP_MANAGER
+//        }
         minSdk = 26
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
 //        consumerProguardFiles("consumer-rules.pro")
     }
     //动态替换资源
@@ -27,7 +27,6 @@ android {
                 manifest.srcFile("src/main/manifest/AndroidManifest.xml")
             }else{
                 manifest.srcFile("src/main/AndroidManifest.xml")
-
             }
         }
     }

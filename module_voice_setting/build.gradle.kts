@@ -12,10 +12,10 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        if (ModuleConfig.isApp) {applicationId = ModuleConfig.MODULE_VOICE_SETTING}
+//        if (ModuleConfig.isApp) {applicationId = ModuleConfig.MODULE_VOICE_SETTING}
 
         minSdk = 26
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
 //        consumerProguardFiles("consumer-rules.pro")
     }
     //动态替换资源
