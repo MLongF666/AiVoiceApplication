@@ -77,12 +77,17 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
+    implementation(project(":lib_base"))
     implementation(libs.material)
     implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+    if (!ModuleConfig.isApp) {
+        implementation(project(":module_app_manager"))
+        implementation(project(":module_constellation"))
+        implementation(project(":module_joke"))
+        implementation(project(":module_map"))
+        implementation(project(":module_setting"))
+        implementation(project(":module_weather"))
+        implementation(project(":module_voice_setting"))
+        implementation(project(":module_developer"))
+    }
 }

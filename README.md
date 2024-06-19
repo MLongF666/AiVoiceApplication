@@ -20,3 +20,14 @@ rootProject.bulidFileName/指定Gradle编译配置文件
 
 App空壳+若干组件
 
+### 组建的构建和管理
+Module
+* 笑话
+* 地图
+* 星座
+* 语音设置
+* 系统设置
+* 天气
+* 应用管理
+* 开发者模式
+

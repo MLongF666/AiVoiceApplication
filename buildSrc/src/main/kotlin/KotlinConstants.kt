@@ -19,3 +19,18 @@ object AppConfig{
     const val storeFileUrl="/src/main/jks/aivoice.jks"
 
 }
+//Module配置
+object ModuleConfig{
+    //是否App
+    var isApp=true
+    //包名
+    const val MODULE_APP_MANAGER="com.example.module_app_manager"
+    const val MODULE_CONSTELLATION="com.example.module_constellation"
+    const val MODULE_DEVELOPER="com.example.module_developer"
+    const val MODULE_JOKE="com.example.module_joke"
+    const val MODULE_MAP="com.example.module_map"
+    const val MODULE_SETTING="com.example.module_setting"
+    const val MODULE_VOICE_SETTING="com.example.module_voice_setting"
+    const val MODULE_WEATHER="com.example.module_weather"
+
+}
