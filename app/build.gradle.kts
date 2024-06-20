@@ -9,7 +9,9 @@ plugins {
 android {
     namespace = AppConfig.namespace
     compileSdk = AppConfig.compileSdk
-
+    buildFeatures {
+        viewBinding = true
+    }
     defaultConfig {
         applicationId = AppConfig.applicationId
         minSdk = AppConfig.minSdk
@@ -76,6 +78,7 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(libs.material)
+    implementation(project(":lib_base"))
     implementation(libs.androidx.activity)
     if (!ModuleConfig.isApp) {
         implementation(project(":module_app_manager"))
