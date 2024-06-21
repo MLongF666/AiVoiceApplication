@@ -1,13 +1,11 @@
 package com.example.lib_base.base
 
-import androidx.appcompat.app.AppCompatActivity
+import android.app.Application
+import com.example.lib_base.helper.ARouterHelper
 
-/**
- * @description: TODO 父类Activity
- * @author: mlf
- * @date: 2024/6/20 16:53
- * @version: 1.0
- */
-class BaseApp : AppCompatActivity() {
-    
+class BaseApp : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        ARouterHelper.initHelper(this)
+    }
 }

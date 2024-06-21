@@ -5,6 +5,8 @@ plugins {
         alias(libs.plugins.android.library)
     }
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+
 }
 
 android {
@@ -15,6 +17,12 @@ android {
 //        if (ModuleConfig.isApp) {applicationId = ModuleConfig.MODULE_VOICE_SETTING}
 
         minSdk = 26
+
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.name)
+            }
+        }
 
 //        consumerProguardFiles("consumer-rules.pro")
     }
@@ -60,4 +68,6 @@ dependencies {
     implementation(libs.androidx.navigation.fragment.ktx)
     implementation(libs.androidx.navigation.ui.ktx)
     implementation(libs.androidx.activity)
+    //运行时注解
+    kapt(libs.arouter.compiler)
 }

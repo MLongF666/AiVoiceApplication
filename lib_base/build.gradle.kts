@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+
 }
 
 android {
@@ -12,6 +14,11 @@ android {
     defaultConfig {
         minSdk = 26
         consumerProguardFiles("consumer-rules.pro")
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.name)
+            }
+        }
     }
 
     buildTypes {
@@ -36,7 +43,15 @@ dependencies {
     api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":lib_network"))
     api(project(":lib_voice"))
+    //eventbus
     api(libs.events)
+    //arouter
+    api(libs.arouter)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    //运行时注解
+    kapt(libs.arouter.compiler)
     api(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
     api(libs.material)

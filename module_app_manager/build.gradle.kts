@@ -1,10 +1,11 @@
 plugins {
     if (ModuleConfig.isApp){
         alias(libs.plugins.android.application)
+
     }else{
         alias(libs.plugins.android.library)
     }
-
+    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
@@ -17,7 +18,11 @@ android {
 //            applicationId=ModuleConfig.MODULE_APP_MANAGER
 //        }
         minSdk = 26
-
+        kapt {
+                arguments {
+                    arg("AROUTER_MODULE_NAME", project.name)
+                }
+        }
 //        consumerProguardFiles("consumer-rules.pro")
     }
     //动态替换资源
@@ -56,4 +61,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    //运行时注解
+    kapt(libs.arouter.compiler)
 }

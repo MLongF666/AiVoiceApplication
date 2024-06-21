@@ -4,6 +4,7 @@ import com.android.build.gradle.internal.api.ApkVariantOutputImpl
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -18,6 +19,14 @@ android {
         targetSdk = AppConfig.targetSdk
         versionCode = AppConfig.versionCode
         versionName = AppConfig.versionName
+
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.name)
+            }
+        }
+
+
     }
     //签名类型
     signingConfigs{
@@ -90,4 +99,6 @@ dependencies {
         implementation(project(":module_voice_setting"))
         implementation(project(":module_developer"))
     }
+    //运行时注解
+    kapt(libs.arouter.compiler)
 }

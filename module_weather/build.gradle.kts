@@ -5,6 +5,8 @@ plugins {
         alias(libs.plugins.android.library)
     }
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
+
 }
 
 android {
@@ -15,6 +17,11 @@ android {
 //        if (ModuleConfig.isApp) applicationId = ModuleConfig.MODULE_WEATHER
         minSdk = 26
 
+        kapt {
+            arguments {
+                arg("AROUTER_MODULE_NAME", project.name)
+            }
+        }
 //        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 //        consumerProguardFiles("consumer-rules.pro")
     }
@@ -55,4 +62,6 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    //运行时注解
+    kapt(libs.arouter.compiler)
 }
