@@ -7,10 +7,11 @@
     android:layout_width="match_parent"
     android:gravity="center"
     android:layout_height="match_parent"
-    tools:context=".ConstellActivity">
+    tools:context=".ConstellAtionActivity">
     <TextView
+        android:textColor="@color/black"
         android:textSize="30sp"
         android:layout_width="wrap_content"
-        android:text="constell"
+        android:id="@+id/tv"
         android:layout_height="wrap_content"/>
 </LinearLayout>

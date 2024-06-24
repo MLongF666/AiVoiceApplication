@@ -10,8 +10,8 @@ plugins {
 }
 
 android {
-    namespace = "com.example.module_voice_setting"
-    compileSdk = 34
+    namespace = ModuleConfig.MODULE_SETTING
+    compileSdk = AppConfig.compileSdk
 
     defaultConfig {
 //        if (ModuleConfig.isApp) {applicationId = ModuleConfig.MODULE_VOICE_SETTING}
@@ -62,12 +62,12 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":lib_base"))
-    implementation(libs.material)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
-    implementation(libs.androidx.activity)
+//    implementation(libs.material)
+//    implementation(libs.androidx.appcompat)
+//    implementation(libs.androidx.constraintlayout)
+//    implementation(libs.androidx.navigation.fragment.ktx)
+//    implementation(libs.androidx.navigation.ui.ktx)
+//    implementation(libs.androidx.activity)
     //运行时注解
     kapt(libs.arouter.compiler)
 }

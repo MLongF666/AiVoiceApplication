@@ -10,9 +10,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.module_weather"
-    compileSdk = 34
-
+    namespace = ModuleConfig.MODULE_WEATHER
+    compileSdk = AppConfig.compileSdk
+    buildFeatures {
+        viewBinding = true
+    }
     defaultConfig {
 //        if (ModuleConfig.isApp) applicationId = ModuleConfig.MODULE_WEATHER
         minSdk = 26
@@ -62,6 +64,10 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+//    implementation(libs.androidx.appcompat)
+//    implementation(libs.material)
+//    implementation(libs.androidx.activity)
+//    implementation(libs.androidx.constraintlayout)
     //运行时注解
     kapt(libs.arouter.compiler)
 }

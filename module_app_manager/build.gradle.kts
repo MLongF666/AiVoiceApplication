@@ -10,9 +10,12 @@ plugins {
 }
 
 android {
-    namespace = "com.example.module_app_manager"
-    compileSdk = 34
+    namespace =  ModuleConfig.MODULE_APP_MANAGER
+    compileSdk = AppConfig.compileSdk
     buildToolsVersion=ModuleConfig.buildToolsVersion
+    buildFeatures {
+        viewBinding = true
+    }
     defaultConfig {
 //        if (ModuleConfig.isApp){
 //            applicationId=ModuleConfig.MODULE_APP_MANAGER
@@ -57,10 +60,10 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":lib_base"))
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+//    implementation(libs.androidx.appcompat)
+//    implementation(libs.material)
+//    implementation(libs.androidx.activity)
+//    implementation(libs.androidx.constraintlayout)
     //运行时注解
     kapt(libs.arouter.compiler)
 }
