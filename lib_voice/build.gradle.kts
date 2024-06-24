@@ -1,9 +1,5 @@
 plugins {
-    if (ModuleConfig.isApp){
-        alias(libs.plugins.android.application)
-    }else{
-        alias(libs.plugins.android.library)
-    }
+    alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
 
@@ -16,12 +12,6 @@ android {
     defaultConfig {
         minSdk = 26
         consumerProguardFiles("consumer-rules.pro")
-
-        kapt {
-            arguments {
-                arg("AROUTER_MODULE_NAME", project.name)
-            }
-        }
     }
 
     buildTypes {

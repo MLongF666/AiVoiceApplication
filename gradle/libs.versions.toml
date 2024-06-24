@@ -13,8 +13,8 @@ navigationFragmentKtx = "2.7.7"
 navigationUiKtx = "2.7.7"
 
 [libraries]
-# implementation 'com.alibaba:arouter-api:1.5.1'
-#    kapt 'com.alibaba:arouter-compiler:1.5.1'
+# implementation 'com.alibaba:arouter-api:1.5.2'
+#    kapt 'com.alibaba:arouter-compiler:1.5.2'
 arouter = { group = "com.alibaba", name = "arouter-api", version = "1.5.2" }
 arouter-compiler = { group = "com.alibaba", name = "arouter-compiler", version = "1.5.2" }
 events = { group = "org.greenrobot", name = "eventbus", version = "3.3.1" }

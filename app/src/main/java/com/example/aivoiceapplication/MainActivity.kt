@@ -5,9 +5,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.aivoiceapplication.databinding.ActivityMainBinding
-import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.event.EventManger
 import com.example.lib_base.event.MessageEvent
+import com.example.lib_base.helper.ARouterHelper
 
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -21,20 +21,22 @@ class MainActivity : AppCompatActivity() {
         val root = binding.root
         setContentView(root)
 
-
         binding.btn.setOnClickListener {
             EventManger.post(1)
         }
-
+        binding.btn1.setOnClickListener {
+            ARouterHelper.startActivity(ARouterHelper.PATH_APP_MANAGER)
+            Log.d("event", "string:"+ARouterHelper.PATH_APP_MANAGER)
+        }
+        binding.btn2.setOnClickListener{
+            ARouterHelper.startActivity(ARouterHelper.PATH_DEVELOPER)
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        binding.btn1.setOnClickListener {
-          var str: String =binding.btn1.text.toString()
-            EventManger.post(1,str)
-            }
     }
+
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onEvent(event: MessageEvent) {
         when (event.type) {
@@ -47,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         EventManger.unregister(this)

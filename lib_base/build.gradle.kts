@@ -54,6 +54,7 @@ dependencies {
     kapt(libs.arouter.compiler)
     api(libs.androidx.core.ktx)
     api(libs.androidx.appcompat)
+    api(libs.androidx.constraintlayout)
     api(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

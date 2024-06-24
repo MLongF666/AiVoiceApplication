@@ -3,8 +3,9 @@ package com.example.lib_base.helper
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import com.alibaba.android.arouter.BuildConfig
+
 import com.alibaba.android.arouter.launcher.ARouter
+import com.example.lib_base.config.BuildConfig
 
 /**
  * @description: TODO
@@ -13,6 +14,17 @@ import com.alibaba.android.arouter.launcher.ARouter
  * @version: 1.0
  */
 object ARouterHelper {
+    const val PATH_APP_MANAGER="/app_manager/app_manager_activity"
+    const val PATH_CONSTELLATION="/constellation/constellation_activity"
+    const val PATH_DEVELOPER="/developer/developer_activity"
+    const val PATH_JOKE="/joke/joke_activity"
+    const val PATH_MAP="/map/map_activity"
+    const val PATH_SETTING="/setting/setting_activity"
+    const val PATH_VOICE_SETTING="/voice_setting/voice_setting_activity"
+    const val PATH_WEATHER="/weather/weather_activity"
+
+
+
     //初始化
     fun initHelper(application:Application){
         if(BuildConfig.DEBUG){

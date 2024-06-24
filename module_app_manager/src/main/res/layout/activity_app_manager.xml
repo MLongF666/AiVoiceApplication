@@ -4,12 +4,11 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".AppManagerActivity">
     <TextView
-        android:id="@+id/textView"
-        android:textSize="30dp"
+        android:textSize="20sp"
         android:layout_width="wrap_content"
-        android:text="App_manager"
         android:layout_centerInParent="true"
+        android:text="AppManagerActivity"
         android:layout_height="wrap_content"/>
 </RelativeLayout>
