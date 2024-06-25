@@ -13,6 +13,14 @@ class SettingActivity : BaseActivity<ActivitySettingBinding>() {
         return "系统设置"
     }
 
+    override fun initEvent() {
+        TODO("Not yet implemented")
+    }
+
+    override fun initData() {
+        TODO("Not yet implemented")
+    }
+
     override fun initViewBinding(): ActivitySettingBinding {
         return ActivitySettingBinding.inflate(layoutInflater)
     }

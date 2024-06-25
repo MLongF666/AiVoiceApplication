@@ -13,6 +13,8 @@ navigationFragmentKtx = "2.7.7"
 navigationUiKtx = "2.7.7"
 
 [libraries]
+recyclerview = { group = "androidx.recyclerview", name = "recyclerview", version = "1.3.2" }
+
 # implementation 'com.alibaba:arouter-api:1.5.2'
 #    kapt 'com.alibaba:arouter-compiler:1.5.2'
 arouter = { group = "com.alibaba", name = "arouter-api", version = "1.5.2" }

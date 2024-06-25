@@ -107,3 +107,14 @@ object ARouterHelper {
 * Log日志
 * Sharepreferences
 
+### AI
+
+* TTS/发音
+* ASR/语义识别
+* WakeUp唤醒
+
+### IntentService服务
+
+* 使用场景/短任务
+* 源码分析/ServiceHandler
+* 生命周期/onHandleIntent

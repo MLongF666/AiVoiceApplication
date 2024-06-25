@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AiVoiceApplication"
         tools:targetApi="31">
         <activity
-            android:name=".DeveloperActivity"
+            android:name=".DeveLoperActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -8,6 +8,14 @@ class VoiceSettingActivity : BaseActivity<ActivityVoiceSettingBinding>() {
         return "语音设置"
     }
 
+    override fun initEvent() {
+        TODO("Not yet implemented")
+    }
+
+    override fun initData() {
+        TODO("Not yet implemented")
+    }
+
     override fun initViewBinding(): ActivityVoiceSettingBinding {
         return ActivityVoiceSettingBinding.inflate(layoutInflater)
     }

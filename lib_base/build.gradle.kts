@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.storage.CacheResetOnProcessCanceled.enabled
+
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -10,7 +12,11 @@ android {
     compileSdk = 34
     buildFeatures {
         viewBinding = true
+        dataBinding = true
     }
+//    dataBinding{
+//        enabled = true
+//    }
     defaultConfig {
         minSdk = 26
         consumerProguardFiles("consumer-rules.pro")
@@ -43,6 +49,7 @@ dependencies {
     api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":lib_network"))
     api(project(":lib_voice"))
+    api(libs.recyclerview)
     //eventbus
     api(libs.events)
     //arouter

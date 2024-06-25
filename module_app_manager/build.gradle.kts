@@ -4,8 +4,10 @@ plugins {
     }else{
         alias(libs.plugins.android.library)
     }
-    alias(libs.plugins.kotlin.kapt)
+//    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.jetbrains.kotlin.android)
+
+    kotlin("kapt")
 
 }
 

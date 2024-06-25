@@ -13,6 +13,14 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
     return "地图"
     }
 
+    override fun initEvent() {
+        TODO("Not yet implemented")
+    }
+
+    override fun initData() {
+        TODO("Not yet implemented")
+    }
+
     override fun initViewBinding(): ActivityMapBinding {
         return ActivityMapBinding.inflate(layoutInflater)
     }

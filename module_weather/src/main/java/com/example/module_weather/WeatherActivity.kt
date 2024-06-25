@@ -13,6 +13,14 @@ class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
         return "天气"
     }
 
+    override fun initEvent() {
+        TODO("Not yet implemented")
+    }
+
+    override fun initData() {
+        TODO("Not yet implemented")
+    }
+
     override fun initViewBinding(): ActivityWeatherBinding {
         return ActivityWeatherBinding.inflate(layoutInflater)
     }

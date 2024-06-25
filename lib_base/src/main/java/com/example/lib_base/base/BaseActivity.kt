@@ -34,6 +34,16 @@ abstract class BaseActivity<T: ViewBinding > : AppCompatActivity() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        initData()
+        initEvent()
+    }
+
+    abstract fun initEvent()
+
+    abstract fun initData()
+
     abstract fun initViewBinding(): T
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {

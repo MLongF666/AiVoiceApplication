@@ -1,3 +1,27 @@
 <resources>
     <string name="app_name">weather</string>
+<!--    固定数据-->
+    <array name="DevelopersArray">
+        <item>[组件化]</item>
+        <item>跳转应用管理</item>
+
+        <item>跳转星座</item>
+        <item>跳转笑话</item>
+        <item>跳转地图</item>
+        <item>跳转设置</item>
+        <item>跳转语音设置</item>
+        <item>跳转天气</item>
+        <item>[在线识别]</item>
+        <item>开始识别</item>
+        <item>停止识别</item>
+        <item>取消识别</item>
+        <item>释放识别</item>
+        <item>[本地唤醒]</item>
+
+
+
+
+
+
+    </array>
 </resources>
