@@ -17,11 +17,11 @@ class JokeActivity : BaseActivity<ActivityJokeBinding>() {
     }
 
     override fun initEvent() {
-        TODO("Not yet implemented")
+
     }
 
     override fun initData() {
-        TODO("Not yet implemented")
+
     }
 
     override fun initViewBinding(): ActivityJokeBinding {

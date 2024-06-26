@@ -31,13 +31,13 @@ abstract class BaseActivity<T: ViewBinding > : AppCompatActivity() {
             }
         }
         initView()
-
+        initData()
+        initEvent()
     }
 
     override fun onStart() {
         super.onStart()
-        initData()
-        initEvent()
+
     }
 
     abstract fun initEvent()

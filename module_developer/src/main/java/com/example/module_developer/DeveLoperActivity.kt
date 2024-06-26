@@ -8,6 +8,9 @@ import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.helper.ARouterHelper
+import com.example.lib_base.utils.L
+import com.example.lib_voice.manager.VoiceManager
+import com.example.lib_voice.tts.VoiceTTs
 import com.example.module_developer.data.DeveloperListData
 import com.example.module_developer.databinding.ActivityDeveLoperBinding
 
@@ -113,15 +116,26 @@ class DeveLoperActivity : BaseActivity<ActivityDeveLoperBinding>() {
     //点击事件
     private fun itemClick(position:Int){
         when(position){
-            1->{
-                ARouterHelper.startActivity(ARouterHelper.PATH_APP_MANAGER)
-            }
-            2->{}
-            3->{}
-            4->{}
-            5->{}
-            6->{}
-            7->{}
+            1->ARouterHelper.startActivity(ARouterHelper.PATH_APP_MANAGER)
+
+            2->ARouterHelper.startActivity(ARouterHelper.PATH_CONSTELLATION)
+
+            3-> ARouterHelper.startActivity(ARouterHelper.PATH_JOKE)
+
+            4->ARouterHelper.startActivity(ARouterHelper.PATH_MAP)
+
+            5->ARouterHelper.startActivity(ARouterHelper.PATH_SETTING)
+
+            6->ARouterHelper.startActivity(ARouterHelper.PATH_VOICE_SETTING)
+
+            7->ARouterHelper.startActivity(ARouterHelper.PATH_WEATHER)
+
+            20->VoiceManager.start("你好，欢迎使用语音助手")
+            21->VoiceManager.pause()
+            22->VoiceManager.resume()
+            23->VoiceManager.stop()
+            24->VoiceManager.release()
+
         }
     }
 

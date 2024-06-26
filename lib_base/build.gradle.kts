@@ -63,7 +63,7 @@ dependencies {
     api(libs.androidx.appcompat)
     api(libs.androidx.constraintlayout)
     api(libs.material)
-    testImplementation(libs.junit)
+//    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
