@@ -45,7 +45,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                             "笑话"->ARouterHelper.startActivity(ARouterHelper.PATH_JOKE)
                             "地图"->ARouterHelper.startActivity(ARouterHelper.PATH_MAP)
                             "应用管理"->ARouterHelper.startActivity(ARouterHelper.PATH_APP_MANAGER)
-                           "语音设置"->ARouterHelper.startActivity(ARouterHelper.PATH_VOICE_SETTING)
+                            "语音设置"->ARouterHelper.startActivity(ARouterHelper.PATH_VOICE_SETTING)
                             "系统设置"->ARouterHelper.startActivity(ARouterHelper.PATH_SETTING)
                             "开发者模式"->ARouterHelper.startActivity(ARouterHelper.PATH_DEVELOPER)
                         }
