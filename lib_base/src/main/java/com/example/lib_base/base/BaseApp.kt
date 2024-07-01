@@ -12,7 +12,7 @@ open class BaseApp : Application() {
         super.onCreate()
         ARouterHelper.initHelper(this)
         NotificationHelper.initHelper(this)
-        VoiceManager.initManager(this)
+//        VoiceManager.initManager(this)
         startService(Intent(this,
             InitService::class.java))
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

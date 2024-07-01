@@ -33,7 +33,7 @@ class VoiceSettingActivity : BaseActivity<ActivityVoiceSettingBinding>() {
 
     override fun initEvent() {
         getBinding().btnTest.setOnClickListener {
-            VoiceManager.start("你好啊，我是小明")
+            VoiceManager.ttsStart("你好啊，我是小明")
         }
         getBinding().voiceSettingSpeedSeekbar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener{
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
@@ -125,8 +125,6 @@ class VoiceSettingActivity : BaseActivity<ActivityVoiceSettingBinding>() {
         //设置最大值
         getBinding().voiceSettingSpeedSeekbar.max=15
         getBinding().voiceSettingVolumeSeekbar.max=15
-
-
 
     }
 }

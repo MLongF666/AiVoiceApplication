@@ -130,11 +130,20 @@ class DeveLoperActivity : BaseActivity<ActivityDeveLoperBinding>() {
 
             7->ARouterHelper.startActivity(ARouterHelper.PATH_WEATHER)
 
-            20->VoiceManager.start("你好，欢迎使用语音助手")
-            21->VoiceManager.pause()
-            22->VoiceManager.resume()
-            23->VoiceManager.stop()
-            24->VoiceManager.release()
+            9->VoiceManager.startAsr()
+            10->VoiceManager.stopAsr()
+            11->VoiceManager.cancelAsr()
+            12->VoiceManager.releaseAsr()
+
+
+            14->VoiceManager.startWakeUp()
+            15->VoiceManager.stopWakeUp()
+
+            20->VoiceManager.ttsStart("你好，欢迎使用语音助手")
+            21->VoiceManager.ttsPause()
+            22->VoiceManager.ttsResume()
+            23->VoiceManager.ttsStop()
+            24->VoiceManager.ttsRelease()
 
         }
     }

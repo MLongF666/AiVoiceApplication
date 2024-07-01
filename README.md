@@ -154,5 +154,5 @@ Application(baseApp)->run InitService(异步执行) ->init通知栏 渠道 ->Mai
 
 ![image-20240625213922009](https://cdn.jsdelivr.net/gh/mlf0214/blogImage@main/img/202406252139110.png)
 
-
+唤醒功能百度给的demo跟成品的App都暂时无法唤醒 考虑到 没有必要浪费这么多时间去一直修改唤醒的问题 所以暂时跳过这个功能
 

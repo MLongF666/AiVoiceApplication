@@ -17,7 +17,6 @@ class VoiceService : Service(){
     override fun onBind(intent: Intent?): IBinder? {
         return null
     }
-
     //START_STICKY 保证服务一直运行，直到被系统杀死
     //START_NOT_STICKY 默认值，服务被系统杀死，不会重启
     //START_REDELIVER_INTENT 重启服务，但会保留最后一次的Intent

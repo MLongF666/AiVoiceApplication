@@ -49,6 +49,9 @@ dependencies {
     api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(project(":lib_network"))
     api(project(":lib_voice"))
+    //andpermission
+//    api(libs.andpermission)
+    api("com.yanzhenjie:permission:2.0.0")
     api(libs.recyclerview)
     //eventbus
     api(libs.events)

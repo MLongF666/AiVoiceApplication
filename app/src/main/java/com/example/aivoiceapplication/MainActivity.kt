@@ -9,6 +9,9 @@ import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.helper.ARouterHelper
+import com.yanzhenjie.permission.Action
+import com.yanzhenjie.permission.AndPermission
+import com.yanzhenjie.permission.runtime.Permission
 
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
@@ -78,9 +81,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
 
     override fun initView() {
         startService(Intent(this, VoiceService::class.java))
-        getBinding().btn.setOnClickListener {
-            ARouterHelper.startActivity(ARouterHelper.PATH_DEVELOPER)
-        }
+//        getBinding().btn.setOnClickListener {
+//            ARouterHelper.startActivity(ARouterHelper.PATH_DEVELOPER)
+//        }
+        AndPermission.with(this)
+            .runtime()
+            .permission(Permission.RECORD_AUDIO)
+            .onGranted(Action<List<String?>> { ARouterHelper.startActivity(ARouterHelper.PATH_DEVELOPER) })
+            .start()
+
 
 
     }
