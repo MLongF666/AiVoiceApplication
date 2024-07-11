@@ -8,8 +8,10 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <application>
-        <service android:name=".service.InitService"/>
+        <service android:name=".service.InitService" android:exported="true"/>
         <activity
             android:name=".base.BaseActivity"
             android:exported="false" />

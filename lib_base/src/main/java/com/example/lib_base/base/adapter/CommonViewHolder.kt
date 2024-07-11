@@ -4,13 +4,10 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
-import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
 
 /**
- * @description: TODO
+ * @description: TODO 通用的Adapter
  * @author: mlf
  * @date: 2024/6/24 19:10
  * @version: 1.0
@@ -20,7 +17,11 @@ class CommonViewHolder(itemView: View):
         private var sparseArray = SparseArray<View>()
     companion object {
         fun getViewHolder(parent: ViewGroup, layoutId: Int): CommonViewHolder {
-            return CommonViewHolder(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
+            var itemView = LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
+            var viewHolder = CommonViewHolder(
+                itemView
+            )
+            return viewHolder
         }
     }
     fun <T: View> getView(id: Int): T {

@@ -1,11 +1,9 @@
 package com.example.lib_base.base.adapter
 
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewbinding.ViewBinding
+import com.example.lib_base.base.impl.OnItemClick
 
 
 /**
@@ -15,6 +13,7 @@ import androidx.viewbinding.ViewBinding
  * @version: 1.0
  */
 class CommonAdapter<T> : RecyclerView.Adapter<CommonViewHolder> {
+    private var onItemClick:OnItemClick<T>?=null
     constructor(data: List<T>, listener: OnBindDataListener<T>){
         this.mData = data
         this.onBindDataListener = listener
@@ -37,11 +36,18 @@ class CommonAdapter<T> : RecyclerView.Adapter<CommonViewHolder> {
         return CommonViewHolder.getViewHolder(parent,layoutId!!)
 
     }
-
+    fun setOnItemClick(onItemClick:OnItemClick<T>){
+        this.onItemClick=onItemClick
+    }
     override fun getItemCount(): Int {
         return mData.size
     }
     override fun onBindViewHolder(holder: CommonViewHolder, position: Int) {
+        if (onItemClick!=null){
+            holder.itemView.setOnClickListener {
+                onItemClick?.onItemClick(position,holder.itemView,mData[position])
+            }
+        }
         onBindDataListener?.onBindViewHolder(mData[position],holder,getItemViewType(position),position)
     }
 

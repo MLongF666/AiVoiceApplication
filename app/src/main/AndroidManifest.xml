@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:usesCleartextTraffic="true"
         android:extractNativeLibs="true"
         android:name="com.example.lib_base.base.BaseApp"
         android:allowBackup="true"
@@ -43,7 +44,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name=".service.VoiceService"/>
+        <service android:name=".service.VoiceService" android:exported="true"/>
     </application>
 
 </manifest>

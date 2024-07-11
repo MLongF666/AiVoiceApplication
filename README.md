@@ -1,4 +1,4 @@
-# 1、本项目核心思想
+## 本项目核心思想
 
 Kotlin+组件化+kotlin Gradle DSL
 
@@ -155,4 +155,57 @@ Application(baseApp)->run InitService(异步执行) ->init通知栏 渠道 ->Mai
 ![image-20240625213922009](https://cdn.jsdelivr.net/gh/mlf0214/blogImage@main/img/202406252139110.png)
 
 唤醒功能百度给的demo跟成品的App都暂时无法唤醒 考虑到 没有必要浪费这么多时间去一直修改唤醒的问题 所以暂时跳过这个功能
+
+## 网络
+
+### retrofit封装
+
+* 创建retrofit对象
+* 构建代理服务类
+* 实现请求方法
+
+### 拦截器
+
+## 主页框架
+
+在viewpager2当中 item当中的布局文件的高和宽 必须设置为 match_parent
+
+也可以在适配器当中设置
+
+### 层叠效果
+
+CommonAdapter
+
+```kotlin
+override fun onCreateViewHolder(parent: ViewGroup, viewType: Int):
+            CommonViewHolder {
+        var layoutId = onBindDataListener?.getLayoutId(viewType)
+        var layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
+        return CommonViewHolder.getViewHolder(parent,layoutId!!,layoutParams)
+
+    }
+```
+
+CommonViewHolder
+
+```kotlin
+fun getViewHolder(parent: ViewGroup, layoutId: Int, layoutParams: ViewGroup.LayoutParams): CommonViewHolder {
+            var itemView = LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
+            if (layoutParams!= null){
+                itemView.layoutParams = layoutParams
+            }
+            var viewHolder = CommonViewHolder(
+                itemView
+            )
+            return viewHolder
+        }
+```
+
+## 	WindowManager 对话窗口
+
+### 窗口权限
+
+### 窗口实现
+
+### 对话列表实现
 
