@@ -9,3 +9,9 @@ package com.example.aivoiceapplication.data
 data class MainListData(val title: String,
                         val color: Int,
                         val icon: Int)
+
+data class ChatListData(
+    val type:Int
+){
+    public lateinit var text: String
+}

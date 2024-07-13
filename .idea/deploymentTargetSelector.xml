@@ -19,10 +19,10 @@
       </SelectionState>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-07-10T11:54:35.592015800Z">
+        <DropdownSelection timestamp="2024-07-11T03:06:24.132383Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=D:\Users\mlf\environment\Android-Canary\avd\.android\avd\Pixel_4_API_31.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=D:\Users\mlf\environment\Android-Canary\avd\.android\avd\Pixel_3a_API_29.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -30,10 +30,10 @@
       </SelectionState>
       <SelectionState runConfigName="module_app_manager">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-06-20T04:34:30.456777Z">
+        <DropdownSelection timestamp="2024-07-12T08:56:45.615430Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=D:\Users\mlf\environment\Android-Canary\avd\.android\avd\Pixel_7a_API_33.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=D:\Users\mlf\environment\Android-Canary\avd\.android\avd\Pixel_3a_API_29.avd" />
             </handle>
           </Target>
         </DropdownSelection>

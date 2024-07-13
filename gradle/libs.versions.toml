@@ -13,6 +13,7 @@ navigationFragmentKtx = "2.7.7"
 navigationUiKtx = "2.7.7"
 
 [libraries]
+lottie = { group = "com.airbnb.android", name = "lottie", version = "4.2.2" }
 #viewpager = { group = "com.zhy", name = "magic-viewpager", version = "1.0.1" }
 viewpager2 = { group = "com.github.zhpanvip", name = "bannerview", version = "2.0.0" }
 andpermission = { group = "com.yanzhenjie", name = "permission", version = "2.0.3" }

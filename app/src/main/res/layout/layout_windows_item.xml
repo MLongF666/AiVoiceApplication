@@ -1,6 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <View
+        android:layout_width="match_parent"
+        android:background="@color/colorAppSystemSetting"
+        android:alpha="0.3"
+        android:layout_height="match_parent"/>
+    <LinearLayout
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chat_list_rv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <com.airbnb.lottie.LottieAnimationView
+            app:lottie_speed="2"
+            android:layout_margin="5dp"
+            android:layout_width="80dp"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="ai_chat_loding.json"
+            app:lottie_loop="true"
+            android:layout_height="80dp"
+            android:id="@+id/lottie_animation_view"/>
+    </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

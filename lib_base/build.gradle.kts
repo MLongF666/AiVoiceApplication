@@ -47,6 +47,8 @@ android {
 
 dependencies {
     api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    //lottie
+    api(libs.lottie)
     //viewpage
     api("androidx.viewpager2:viewpager2:1.1.0")
     api(project(":lib_network"))

@@ -18,23 +18,6 @@
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false"/>
-
-<!--        即使没有在代码中设置 也可以在清单文件中读取到百度语音的app_id、api_key、secret_key -->
-        <meta-data
-            android:name="com.baidu.speech.APP_ID"
-            android:value="87114144">
-        </meta-data>
-        <meta-data
-            android:name="com.baidu.speech.API_KEY"
-            android:value="dTGD2VCXjJak3dtvWeGOLYUc">
-        </meta-data>
-        <meta-data
-            android:name="com.baidu.speech.SECRET_KEY"
-            android:value="u86JN3mX5QrOwoc1snYhLAOHz5C1Wz4R">
-        </meta-data>
-
-
-
         <activity
             android:name=".MainActivity"
             android:exported="true"

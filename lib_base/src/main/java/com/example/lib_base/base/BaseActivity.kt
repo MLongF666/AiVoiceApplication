@@ -75,7 +75,7 @@ abstract class BaseActivity<T: ViewBinding > : AppCompatActivity() {
         return true
     }
     //申请窗口权限
-    protected fun requestWindowPermission() {
+    protected fun requestWindowPermission(packageName:String) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             startActivityForResult(
                 Intent(

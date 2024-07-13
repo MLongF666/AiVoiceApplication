@@ -2,12 +2,16 @@ package com.example.lib_base.service
 
 import android.app.IntentService
 import android.content.Intent
+import android.media.SoundPool
 import android.os.Build
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.helper.NotificationHelper
+import com.example.lib_base.helper.SoundPoolHelper
+import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.utils.L
 import com.example.lib_base.utils.SpUtil
 import com.example.lib_voice.manager.VoiceManager
+import com.example.lib_voice.words.WordsTools
 
 /**
  * @description: TODO
@@ -28,6 +32,9 @@ class InitService : IntentService(InitService::class.simpleName) {
     }
     override fun onHandleIntent(intent: Intent?) {
         SpUtil.init(this)
+        WordsTools.initTools(this)
+        SoundPoolHelper.init(this)
+        AppHelper.initHelper(this)
         L.i("执行初始化操作")
     }
 

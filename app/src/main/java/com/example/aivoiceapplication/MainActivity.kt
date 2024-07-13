@@ -22,13 +22,10 @@ import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.base.impl.OnItemClick
 import com.example.lib_base.helper.ARouterHelper
+import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
 import com.example.lib_network.interceptor.HttpManager
-
-import com.yanzhenjie.permission.Action
-import com.yanzhenjie.permission.AndPermission
-import com.yanzhenjie.permission.runtime.Permission
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -88,7 +85,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         }
         //窗口权限
         if (!checkWindowPermission()){
-            requestWindowPermission()
+            requestWindowPermission(packageName)
         }
         initPageData()
         initPageView()

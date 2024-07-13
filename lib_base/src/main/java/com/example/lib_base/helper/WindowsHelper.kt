@@ -21,16 +21,14 @@ object WindowsHelper {
     fun initHelper(context: Context) {
         mContext = context
         mWindowManager = mContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        mLayoutParams=createLayoutParams(100, 100, 10, 10)
+        mLayoutParams=createLayoutParams()
     }
 
-    private fun createLayoutParams(width: Int, height: Int, x: Int, y: Int): WindowManager.LayoutParams {
+    private fun createLayoutParams(): WindowManager.LayoutParams {
         val layoutParams = WindowManager.LayoutParams()
         layoutParams.apply {
-            this.width = width
-            this.height = height
-            this.x = x
-            this.y = y
+            this.width = WindowManager.LayoutParams.MATCH_PARENT
+            this.height = WindowManager.LayoutParams.MATCH_PARENT
             gravity = Gravity.TOP or Gravity.LEFT
             flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or

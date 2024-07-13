@@ -2,10 +2,19 @@ package com.example.aivoiceapplication.service
 
 import android.app.Service
 import android.content.Intent
+import android.os.Handler
 import android.os.IBinder
 import android.util.Log
+import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 import com.example.aivoiceapplication.R
+import com.example.aivoiceapplication.adapter.ChatListAdapter
+import com.example.aivoiceapplication.data.ChatListData
+import com.example.aivoiceapplication.entity.AppConstants
 import com.example.lib_base.helper.NotificationHelper
+import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.WindowsHelper
 import com.example.lib_base.utils.L
 import com.example.lib_voice.engine.VoiceEngineAnalyze
@@ -22,6 +31,9 @@ import org.json.JSONObject
  * @version: 1.0
  */
 class VoiceService : Service(), OnNluResultListener {
+    private lateinit var  mLottieAnimationView:LottieAnimationView
+    private var chatListAdapter: ChatListAdapter? = null
+    private val mHandler = Handler()
     private val TAG = VoiceService::class.java.simpleName
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -39,18 +51,26 @@ class VoiceService : Service(), OnNluResultListener {
 
     override fun onCreate() {
         initCoreVoiceService()
+        showWindow()
         super.onCreate()
     }
-
+    private lateinit var mFullWindowsView:View
+    private lateinit var mChatListView:RecyclerView
+    private var mChatList= ArrayList<ChatListData>()
     private fun initCoreVoiceService() {
         WindowsHelper.initHelper(this)
-        WindowsHelper.getView(R.layout.layout_windows_item)
-
+        mFullWindowsView=WindowsHelper.getView(R.layout.layout_windows_item)
+        mChatListView = mFullWindowsView.findViewById<RecyclerView>(R.id.chat_list_rv)
+        mLottieAnimationView = mFullWindowsView.findViewById<LottieAnimationView>(R.id.lottie_animation_view)
+        mChatListView.layoutManager=LinearLayoutManager(this)
+        chatListAdapter = ChatListAdapter(mChatList)
+        mChatListView.adapter= chatListAdapter
 
         VoiceManager.initManager(this, object : OnAsrResultListener {
             //准备就绪
             override fun weakUpReady() {
                L.i("唤醒准备就绪")
+//                showWindow()
             }
 
             override fun asrStartSpeak() {
@@ -59,6 +79,7 @@ class VoiceService : Service(), OnNluResultListener {
 
             override fun asrStopSpeak() {
                 L.i("结束说话")
+//                hideWindow()
             }
 
             override fun weakUpSuccess(result: JSONObject) {
@@ -83,6 +104,7 @@ class VoiceService : Service(), OnNluResultListener {
         })
     }
 
+
     //绑定通知栏
     private fun bindNotification() {
         L.i("绑定通知栏")
@@ -92,6 +114,31 @@ class VoiceService : Service(), OnNluResultListener {
 
     override fun queryWeather(city: String, date: String) {
         L.i("查询天气${city} ${date}")
+    }
+
+    private fun showWindow(){
+        L.i("=======显示窗口=======")
+        WindowsHelper.showView(mFullWindowsView)
+        mLottieAnimationView.playAnimation()
+    }
+    private fun hideWindow(){
+        L.i("========隐藏窗口======")
+        mHandler.postDelayed({
+            WindowsHelper.hideView(mFullWindowsView)
+            mLottieAnimationView.pauseAnimation()
+            SoundPoolHelper.play(R.raw.record_over)
+        },2000)
+
+    }
+
+    private fun addMineText(text:String){
+        var bean = ChatListData(AppConstants.TYPE_MINE_TEXT)
+        bean.text=text
+        addBaseText(bean)
+    }
+    private fun addBaseText(bean:ChatListData){
+        mChatList.add(bean)
+        chatListAdapter?.notifyItemChanged(mChatList.size-1)
     }
 
 }

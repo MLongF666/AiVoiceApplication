@@ -19,7 +19,7 @@ object AppConfig{
 //Module配置
 object ModuleConfig{
     //是否App
-    var isApp=false
+    var isApp=true
     //编译工具版本
     const val buildToolsVersion = "34.0.0"
     //包名
