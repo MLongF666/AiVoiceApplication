@@ -21,7 +21,8 @@ import com.example.lib_voice.engine.VoiceEngineAnalyze
 import com.example.lib_voice.impl.OnAsrResultListener
 import com.example.lib_voice.impl.OnNluResultListener
 import com.example.lib_voice.manager.VoiceManager
-import com.example.lib_voice.wakeup.VoiceWakeUp
+import com.iflytek.cloud.WakeuperResult
+
 import org.json.JSONObject
 
 /**
@@ -51,7 +52,7 @@ class VoiceService : Service(), OnNluResultListener {
 
     override fun onCreate() {
         initCoreVoiceService()
-        showWindow()
+//        showWindow()
         super.onCreate()
     }
     private lateinit var mFullWindowsView:View
@@ -65,12 +66,11 @@ class VoiceService : Service(), OnNluResultListener {
         mChatListView.layoutManager=LinearLayoutManager(this)
         chatListAdapter = ChatListAdapter(mChatList)
         mChatListView.adapter= chatListAdapter
-
-        VoiceManager.initManager(this, object : OnAsrResultListener {
+        VoiceManager.initManager(this,getExternalFilesDir("msc")?.absolutePath + "/ivw.wav" ,object : OnAsrResultListener {
             //准备就绪
             override fun weakUpReady() {
-               L.i("唤醒准备就绪")
-//                showWindow()
+                L.i("唤醒准备就绪")
+                VoiceManager.ttsStart("唤醒引擎准备就绪")
             }
 
             override fun asrStartSpeak() {
@@ -79,12 +79,17 @@ class VoiceService : Service(), OnNluResultListener {
 
             override fun asrStopSpeak() {
                 L.i("结束说话")
-//                hideWindow()
             }
 
             override fun weakUpSuccess(result: JSONObject) {
                 L.i("唤醒成功${result}")
-                VoiceManager.startAsr()
+                //当唤醒词是小爱同学才开始识别
+//                VoiceManager.startAsr()
+            }
+
+            override fun weakUpSuccess(result: WakeuperResult) {
+                var text = result.resultString
+                VoiceManager.ttsStart("你好 我在")
             }
 
             override fun weakUpError(text: String) {

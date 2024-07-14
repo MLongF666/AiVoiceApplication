@@ -25,13 +25,13 @@ object VoiceAsr {
         map[SpeechConstant.ACCEPT_AUDIO_VOLUME]=true
         map[SpeechConstant.ACCEPT_AUDIO_DATA]=false
         map[SpeechConstant.DISABLE_PUNCTUATION]=false
-        map[SpeechConstant.PID]=15363//15373
-        //设置key
-        map[SpeechConstant.APP_ID]= VoiceManager.VOICE_APP_ID
-        map[SpeechConstant.APP_KEY]= VoiceManager.VOICE_APP_KEY
-        map[SpeechConstant.SECRET]= VoiceManager.VOICE_APP_SECRET
+        map[SpeechConstant.PID]=15373//15373
+//        //设置key
+//        map[SpeechConstant.APP_ID]= VoiceManager.VOICE_APP_ID
+//        map[SpeechConstant.APP_KEY]= VoiceManager.VOICE_APP_KEY
+//        map[SpeechConstant.SECRET]= VoiceManager.VOICE_APP_SECRET
         //转换成Json
-        asrJson= JSONObject(map as Map<Any, Any>?).toString()
+        asrJson= JSONObject(map as Map<Any, Any>).toString()
         asr = EventManagerFactory.create(mContext, "asr")
         asr.registerListener(listener)
     }
@@ -48,7 +48,6 @@ object VoiceAsr {
     }
     //销毁识别
     fun releaseAsr(listener: EventListener){
-        asr.send(SpeechConstant.ASR_CANCEL,null,null,0,0)
         asr.unregisterListener(listener)
     }
 }

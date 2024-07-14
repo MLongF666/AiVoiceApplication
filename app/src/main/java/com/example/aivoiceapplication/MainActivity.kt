@@ -3,10 +3,6 @@ package com.example.aivoiceapplication
 
 import android.Manifest
 import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
-import android.os.Build
-import android.provider.Settings
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -22,7 +18,6 @@ import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.base.impl.OnItemClick
 import com.example.lib_base.helper.ARouterHelper
-import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
 import com.example.lib_network.interceptor.HttpManager

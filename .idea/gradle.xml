@@ -15,6 +15,7 @@
             </builds>
           </compositeBuild>
         </compositeConfiguration>
+        <option name="testRunner" value="GRADLE" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
         <option name="gradleHome" value="$PROJECT_DIR$/../../../../../develep/gradle-8.2" />
         <option name="gradleJvm" value="#JAVA_HOME" />
@@ -34,6 +35,7 @@
             <option value="$PROJECT_DIR$/module_setting" />
             <option value="$PROJECT_DIR$/module_voice_setting" />
             <option value="$PROJECT_DIR$/module_weather" />
+            <option value="$PROJECT_DIR$/mscV5PlusDemo" />
           </set>
         </option>
         <option name="resolveExternalAnnotations" value="false" />

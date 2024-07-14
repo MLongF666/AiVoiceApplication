@@ -1,4 +1,9 @@
 <resources>
+    //讯飞开放平台APPID
+    <string name="app_id">c3558430</string>
+
+
+
     <!--主页列表图标-->
     <string-array name="MainIconArray">
         <item>@drawable/img_main_weather</item>

@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<!--    讯飞开放平台申请的appid -->
+    <!-- 请替换成在语音云官网申请的appid -->
+    <string name="app_id">c3558430</string>
+
 
     <!--语音词语-->
     <array name="WakeUpListArray">

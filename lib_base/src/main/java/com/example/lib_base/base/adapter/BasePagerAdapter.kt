@@ -26,11 +26,6 @@ class BasePagerAdapter(private val mList: List<View>) : PagerAdapter() {
     override fun instantiateItem(view: ViewGroup, position: Int): Any {
         val currentPosition: Int = (position % mList.size)
         val iv: View = mList[currentPosition]
-        if (iv.parent != null) {
-            (iv.parent as ViewPager).removeView(iv)
-        }
-        Log.d("tag", "currentPosition == $currentPosition")
-
         view.addView(iv)
         return iv
     }

@@ -10,8 +10,10 @@ import android.graphics.drawable.Drawable
  */
 
 //包名 应用名 icon 第一启动类 是否是系统应用
-data class AppData(val packageName: String,
-                   val appName: String,
-                   val appIcon: Drawable,
-                   val firstRunName: String,
-                   val isSystemApp: Boolean)
+data class AppData(
+    val packName: String,
+    val appName: String,
+    val appIcon: Drawable,
+    val firstRunName: String,
+    val isSystemApp: Boolean
+)

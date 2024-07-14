@@ -11,7 +11,7 @@ plugins {
 
 android {
     namespace = AppConfig.namespace
-    compileSdk = AppConfig.compileSdk
+    compileSdk = 34
     buildFeatures {
         viewBinding = true
     }
@@ -88,6 +88,7 @@ dependencies {
     implementation(libs.material)
     implementation(project(":lib_base"))
     implementation(libs.androidx.activity)
+    implementation(files("libs\\Msc.jar"))
     if (!ModuleConfig.isApp) {
         implementation(project(":module_app_manager"))
         implementation(project(":module_constellation"))

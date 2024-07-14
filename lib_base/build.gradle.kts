@@ -53,6 +53,7 @@ dependencies {
     api("androidx.viewpager2:viewpager2:1.1.0")
     api(project(":lib_network"))
     api(project(":lib_voice"))
+
     //andpermission
 //    api(libs.andpermission)
     api("com.yanzhenjie:permission:2.0.0")
@@ -64,6 +65,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
+    api(files("libs\\BaiduLBS_Android.jar"))
+    api(files("libs\\IndoorscapeAlbumPlugin.jar"))
     //运行时注解
     kapt(libs.arouter.compiler)
     api(libs.androidx.core.ktx)
