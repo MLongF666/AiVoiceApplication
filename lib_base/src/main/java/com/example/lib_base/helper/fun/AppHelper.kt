@@ -63,6 +63,7 @@ object AppHelper {
 
         L.e("mAllAppList:$mAllAppList")
         L.e("mAllAppSize:${mAllAppList.size}")
+        L.i("appInfo:${appInfo.size}${appInfo}")
 
         initPageView()
 

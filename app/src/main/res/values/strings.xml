@@ -4,6 +4,8 @@
 
 
 
+
+    <string name="text_voice_wakeup_tips">正在聆听…</string>
     <!--主页列表图标-->
     <string-array name="MainIconArray">
         <item>@drawable/img_main_weather</item>

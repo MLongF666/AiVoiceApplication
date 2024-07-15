@@ -131,10 +131,10 @@ object VoiceManager :EventListener, WakeuperListener {
             SpeechConstant.CALLBACK_EVENT_WAKEUP_SUCCESS -> mOnAsrResultListener.weakUpSuccess(
                 allJson
             )
-            SpeechConstant.CALLBACK_EVENT_WAKEUP_ERROR -> mOnAsrResultListener.weakUpError("唤醒失败")
+//            SpeechConstant.CALLBACK_EVENT_WAKEUP_ERROR -> mOnAsrResultListener.weakUpError("唤醒失败")
             SpeechConstant.CALLBACK_EVENT_ASR_FINISH -> mOnAsrResultListener.asrResult(allJson)
             SpeechConstant.CALLBACK_EVENT_ASR_PARTIAL -> {
-//                mOnAsrResultListener.updateUserText(allJson.optString("best_result"))
+                mOnAsrResultListener.updateUserText(allJson.optString("best_result"))
                 byte?.let {
                     val nlu = JSONObject(String(byte, offset, length))
                     mOnAsrResultListener.nluResult(nlu)
@@ -157,6 +157,7 @@ object VoiceManager :EventListener, WakeuperListener {
     }
 
     override fun onError(p0: SpeechError?) {
+        mOnAsrResultListener.weakUpError("唤醒失败")
         Log.d("IFVoiceWakeUp", "onError: ")
     }
 

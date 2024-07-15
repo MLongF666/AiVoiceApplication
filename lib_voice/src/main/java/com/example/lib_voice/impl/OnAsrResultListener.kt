@@ -26,6 +26,7 @@ interface OnAsrResultListener {
     fun nluResult(result: JSONObject)
     //唤醒成功
     fun weakUpSuccess(result: WakeuperResult)
+    fun updateUserText(text: String)
     //语音合成结果
 
 }

@@ -1,31 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
     <View
         android:layout_width="match_parent"
-        android:background="@color/colorAppSystemSetting"
-        android:alpha="0.3"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent"
+        android:alpha="0.5"
+        android:background="@android:color/black" />
     <LinearLayout
-        android:gravity="bottom"
-        android:orientation="vertical"
+        android:layout_above="@+id/mLottieLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="vertical">
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chat_list_rv"
+            android:id="@+id/mChatListView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
-        <com.airbnb.lottie.LottieAnimationView
-            app:lottie_speed="2"
-            android:layout_margin="5dp"
-            android:layout_width="80dp"
-            app:lottie_autoPlay="true"
-            app:lottie_fileName="ai_chat_loding.json"
-            app:lottie_loop="true"
-            android:layout_height="80dp"
-            android:id="@+id/lottie_animation_view"/>
+            android:layout_height="wrap_content" />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/mLottieLayout"
+        android:layout_alignParentBottom="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/mLottieView"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            app:lottie_fileName="voiceloading2.json"
+            app:lottie_loop="true"
+            app:lottie_speed="1" />
+        <TextView
+            android:layout_margin="10dp"
+            android:gravity="center"
+            android:textSize="@dimen/voice_chat_size"
+            android:id="@+id/tvVoiceTips"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/ivCloseWindow"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="20dp"
+        android:src="@drawable/windowsclose" />
 
 </RelativeLayout>

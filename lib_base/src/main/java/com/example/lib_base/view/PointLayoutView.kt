@@ -47,7 +47,8 @@ class PointLayoutView:LinearLayout {
             return
         }
         for (i in 0 until mListImageView.size){
-            if (i==index) mListImageView[i].setImageResource(R.drawable.shape_point_select) else{
+            if (i==index) mListImageView[i].setImageResource(R.drawable.shape_point_select)
+            else{
                 mListImageView[i].setImageResource(R.drawable.shape_point_normal)
             }
         }

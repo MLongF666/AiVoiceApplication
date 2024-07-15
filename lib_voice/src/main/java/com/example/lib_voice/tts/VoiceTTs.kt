@@ -32,9 +32,9 @@ object VoiceTTs : SpeechSynthesizerListener {
         mSpeechSynthesizer.setSpeechSynthesizerListener(this)
         //其他参数
         //发声人
-        setPeople(0)
+        setPeople(5118)
         //语速
-        setSpeed(5)
+        setSpeed(6)
         //音量
         setVolume(15)
         //初始化

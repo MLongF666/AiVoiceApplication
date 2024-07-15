@@ -1,6 +1,7 @@
 package com.example.lib_base.helper
 
 import android.content.Context
+import android.graphics.PixelFormat
 import android.os.Build
 import android.view.Gravity
 import android.view.View
@@ -29,7 +30,8 @@ object WindowsHelper {
         layoutParams.apply {
             this.width = WindowManager.LayoutParams.MATCH_PARENT
             this.height = WindowManager.LayoutParams.MATCH_PARENT
-            gravity = Gravity.TOP or Gravity.LEFT
+            gravity = Gravity.CENTER
+            format = PixelFormat.TRANSLUCENT
             flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
@@ -53,7 +55,7 @@ object WindowsHelper {
             mWindowManager.addView(view, mLayoutParams)
         }
     }
-    //显示窗口 子定义
+    //显示窗口 自定义
     fun showView(view: View,lp:WindowManager.LayoutParams) {
         if (view.parent == null){
             mWindowManager.addView(view, lp)

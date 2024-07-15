@@ -6,12 +6,15 @@ import android.os.Handler
 import android.os.IBinder
 import android.util.Log
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.example.aivoiceapplication.R
 import com.example.aivoiceapplication.adapter.ChatListAdapter
 import com.example.aivoiceapplication.data.ChatListData
+import com.example.aivoiceapplication.databinding.LayoutWindowsItemBinding
 import com.example.aivoiceapplication.entity.AppConstants
 import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.helper.SoundPoolHelper
@@ -21,6 +24,8 @@ import com.example.lib_voice.engine.VoiceEngineAnalyze
 import com.example.lib_voice.impl.OnAsrResultListener
 import com.example.lib_voice.impl.OnNluResultListener
 import com.example.lib_voice.manager.VoiceManager
+import com.example.lib_voice.tts.VoiceTTs
+import com.example.lib_voice.words.WordsTools
 import com.iflytek.cloud.WakeuperResult
 
 import org.json.JSONObject
@@ -32,6 +37,8 @@ import org.json.JSONObject
  * @version: 1.0
  */
 class VoiceService : Service(), OnNluResultListener {
+
+    private lateinit var  textViewTips:TextView
     private lateinit var  mLottieAnimationView:LottieAnimationView
     private var chatListAdapter: ChatListAdapter? = null
     private val mHandler = Handler()
@@ -61,9 +68,16 @@ class VoiceService : Service(), OnNluResultListener {
     private fun initCoreVoiceService() {
         WindowsHelper.initHelper(this)
         mFullWindowsView=WindowsHelper.getView(R.layout.layout_windows_item)
-        mChatListView = mFullWindowsView.findViewById<RecyclerView>(R.id.chat_list_rv)
-        mLottieAnimationView = mFullWindowsView.findViewById<LottieAnimationView>(R.id.lottie_animation_view)
-        mChatListView.layoutManager=LinearLayoutManager(this)
+        mChatListView = mFullWindowsView.findViewById<RecyclerView>(R.id.mChatListView)
+        mLottieAnimationView = mFullWindowsView.findViewById<LottieAnimationView>(R.id.mLottieView)
+        textViewTips = mFullWindowsView.findViewById<TextView>(R.id.tvVoiceTips)
+        mFullWindowsView.findViewById<ImageView>(R.id.ivCloseWindow).setOnClickListener {
+            hideWindow()
+        }
+        var layoutManager = LinearLayoutManager(this)
+        layoutManager.stackFromEnd=true
+        mChatListView.layoutManager= layoutManager
+
         chatListAdapter = ChatListAdapter(mChatList)
         mChatListView.adapter= chatListAdapter
         VoiceManager.initManager(this,getExternalFilesDir("msc")?.absolutePath + "/ivw.wav" ,object : OnAsrResultListener {
@@ -79,23 +93,21 @@ class VoiceService : Service(), OnNluResultListener {
 
             override fun asrStopSpeak() {
                 L.i("结束说话")
+//                hideWindow()
             }
 
             override fun weakUpSuccess(result: JSONObject) {
                 L.i("唤醒成功${result}")
-                //当唤醒词是小爱同学才开始识别
-//                VoiceManager.startAsr()
             }
 
+            //科大讯飞唤醒成功
             override fun weakUpSuccess(result: WakeuperResult) {
-                var text = result.resultString
-                VoiceManager.ttsStart("你好 我在")
+                wakeUpFix(result)
             }
 
             override fun weakUpError(text: String) {
                 L.i("唤醒失败${text}")
-                //由于唤醒功能暂未成功 所以唤醒失败也开启ASR
-                VoiceManager.startAsr()
+                hideWindow()
             }
 
             override fun asrResult(result: JSONObject) {
@@ -104,9 +116,31 @@ class VoiceService : Service(), OnNluResultListener {
 
             override fun nluResult(nlu: JSONObject) {
                 L.i("语义识别结果${nlu}")
+                addMineText(nlu.optString("raw_text"))
                 VoiceEngineAnalyze.analyzeNlu(nlu, this@VoiceService)
             }
+
+            override fun updateUserText(text: String) {
+                updateTips(text)
+            }
         })
+    }
+
+    private fun wakeUpFix(result: WakeuperResult) {
+        var text = result.resultString
+        showWindow()
+        updateTips(getString(R.string.text_voice_wakeup_tips))
+        //应答
+        val wakeupText = WordsTools.wakeupWords()
+        addAiText(wakeupText)
+        VoiceManager.ttsStart(
+            wakeupText,
+            object :VoiceTTs.OnTTSResultListener{
+                override fun onTTEnd() {
+                    //开始识别
+                    VoiceManager.startAsr()
+                }
+            })
     }
 
 
@@ -132,7 +166,7 @@ class VoiceService : Service(), OnNluResultListener {
             WindowsHelper.hideView(mFullWindowsView)
             mLottieAnimationView.pauseAnimation()
             SoundPoolHelper.play(R.raw.record_over)
-        },2000)
+        },500)
 
     }
 
@@ -141,9 +175,21 @@ class VoiceService : Service(), OnNluResultListener {
         bean.text=text
         addBaseText(bean)
     }
+    private fun addAiText(text: String) {
+        var bean = ChatListData(AppConstants.TYPE_AI_TEXT)
+        bean.text = text
+        addBaseText(bean)
+    }
     private fun addBaseText(bean:ChatListData){
         mChatList.add(bean)
-        chatListAdapter?.notifyItemChanged(mChatList.size-1)
+        chatListAdapter?.notifyItemInserted(mChatList.size-1)
+        //滑动到最后一条元素
+        mChatListView.scrollToPosition(chatListAdapter!!.itemCount -1);//此句为设置显示
+    }
+
+    private fun updateTips(text:String){
+        L.i("更新提示语${text}")
+        textViewTips.text=text
     }
 
 }

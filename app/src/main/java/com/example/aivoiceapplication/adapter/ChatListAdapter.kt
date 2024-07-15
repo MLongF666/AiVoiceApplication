@@ -23,8 +23,7 @@ class ChatListAdapter(data: List<ChatListData>) :
         ) {
             when(type){
                 AppConstants.TYPE_MINE_TEXT -> viewHolder.getView<TextView>(R.id.tv_mine_content).text = model.text
-                AppConstants.TYPE_AI_TEXT -> {
-                }
+                AppConstants.TYPE_AI_TEXT -> viewHolder.getView<TextView>(R.id.tv_chat_ai).text = model.text
                 AppConstants.TYPE_WEATHER_TEXT -> {
                 }
             }
