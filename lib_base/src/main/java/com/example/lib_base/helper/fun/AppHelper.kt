@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -61,7 +62,11 @@ object AppHelper {
             mAllAppList.add(appData)
         }
 
-        L.e("mAllAppList:$mAllAppList")
+        if (mAllAppList.size>0){
+            mAllAppList.forEach {
+                L.d("appInfo:${it.appName};${it.packName}")
+            }
+        }
         L.e("mAllAppSize:${mAllAppList.size}")
         L.i("appInfo:${appInfo.size}${appInfo}")
 
@@ -124,6 +129,7 @@ object AppHelper {
                     intentApp(it.packName)
                     return true
                 }
+
             }
         }
         return false
@@ -176,6 +182,7 @@ object AppHelper {
         intent.data = uri
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         mContext.startActivity(intent)
+        Log.i("TAG", "intentUnInstallApp: $packageName")
     }
 
     //跳转应用商店
@@ -185,5 +192,9 @@ object AppHelper {
         intent.setPackage(markPackageName)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         mContext.startActivity(intent)
+    }
+    //是否为其他App
+    fun isOtherApp(appName: String): Boolean {
+        return mAllAppList.find { it.appName == appName } == null
     }
 }

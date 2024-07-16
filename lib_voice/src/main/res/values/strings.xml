@@ -32,4 +32,6 @@
         <item>主人有需要再叫我</item>
     </array>
 
+    <string name="text_voice_app_not_open">很抱歉，无法为你打开%s</string>
+    <string name="text_voice_app_open">正在为你打开%s</string>
 </resources>

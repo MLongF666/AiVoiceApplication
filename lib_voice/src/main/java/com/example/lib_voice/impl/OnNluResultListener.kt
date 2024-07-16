@@ -7,6 +7,9 @@ package com.example.lib_voice.impl
  * @version: 1.0
  */
 interface OnNluResultListener {
+    //查询天气
     fun queryWeather(city: String, date: String)
+    //听不懂你的话
+    fun nluError()
 
 }

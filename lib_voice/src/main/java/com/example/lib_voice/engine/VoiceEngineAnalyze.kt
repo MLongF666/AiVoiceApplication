@@ -2,6 +2,7 @@ package com.example.lib_voice.engine
 
 import android.util.Log
 import com.example.lib_voice.impl.OnNluResultListener
+import com.example.lib_voice.words.NluWords
 import org.json.JSONObject
 
 /**
@@ -35,6 +36,7 @@ object VoiceEngineAnalyze {
         var intent = result.optString("intent")
         var slots = result.optJSONArray("slots")?: return
         when (domain) {
+
 
         }
 

@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
-import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -14,17 +13,19 @@ import com.airbnb.lottie.LottieAnimationView
 import com.example.aivoiceapplication.R
 import com.example.aivoiceapplication.adapter.ChatListAdapter
 import com.example.aivoiceapplication.data.ChatListData
-import com.example.aivoiceapplication.databinding.LayoutWindowsItemBinding
 import com.example.aivoiceapplication.entity.AppConstants
 import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.WindowsHelper
+import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.utils.L
 import com.example.lib_voice.engine.VoiceEngineAnalyze
 import com.example.lib_voice.impl.OnAsrResultListener
 import com.example.lib_voice.impl.OnNluResultListener
 import com.example.lib_voice.manager.VoiceManager
 import com.example.lib_voice.tts.VoiceTTs
+import com.example.lib_voice.util.VoiceAnalysisUtil
+import com.example.lib_voice.words.Keyword
 import com.example.lib_voice.words.WordsTools
 import com.iflytek.cloud.WakeuperResult
 
@@ -116,7 +117,11 @@ class VoiceService : Service(), OnNluResultListener {
 
             override fun nluResult(nlu: JSONObject) {
                 L.i("语义识别结果${nlu}")
-                addMineText(nlu.optString("raw_text"))
+                val text = nlu.optString("raw_text")
+                addMineText(text)
+                //识别指令
+                identifyCommand(text)
+
                 VoiceEngineAnalyze.analyzeNlu(nlu, this@VoiceService)
             }
 
@@ -126,21 +131,50 @@ class VoiceService : Service(), OnNluResultListener {
         })
     }
 
+    //识别指令 启动 下载 卸载 升级
+    private fun identifyCommand(text: String) {
+        if (text.contains(Keyword.KEY_OPEN_APP)) {
+            val appName = VoiceAnalysisUtil.analysisOpenApp(text)
+            L.i("应用${appName}")
+            openApp(appName)
+
+        }
+        if (text.contains(Keyword.KEY_DELETE)){
+            val appName = VoiceAnalysisUtil.analysisDelete(text)
+            deletedApp(appName)
+        }
+        // const val KEY_UPDATE = "更新"
+        //    const val KEY_INSTALL = "安装"
+        //    const val KEY_DOWNLOAD = "下载"
+        //    //升级
+        //    const val KEY_UPGRADE = "升级"
+        else if (text.contains(Keyword.KEY_DOWNLOAD)||
+            text.contains(Keyword.KEY_UPDATE)||
+            text.contains(Keyword.KEY_INSTALL)||
+            text.contains(Keyword.KEY_UPGRADE)){
+            val appName = VoiceAnalysisUtil.analysisApp(text)
+            L.i("other AppName:$appName")
+            otherApp(appName)
+        }
+
+
+    }
+
+
+
+
     private fun wakeUpFix(result: WakeuperResult) {
         var text = result.resultString
         showWindow()
         updateTips(getString(R.string.text_voice_wakeup_tips))
         //应答
         val wakeupText = WordsTools.wakeupWords()
-        addAiText(wakeupText)
-        VoiceManager.ttsStart(
-            wakeupText,
-            object :VoiceTTs.OnTTSResultListener{
-                override fun onTTEnd() {
-                    //开始识别
-                    VoiceManager.startAsr()
-                }
-            })
+        addAiText(wakeupText,object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                //开始识别
+                VoiceManager.startAsr()
+            }
+        })
     }
 
 
@@ -153,6 +187,10 @@ class VoiceService : Service(), OnNluResultListener {
 
     override fun queryWeather(city: String, date: String) {
         L.i("查询天气${city} ${date}")
+    }
+
+    override fun nluError() {
+        L.i("语义识别失败")
     }
 
     private fun showWindow(){
@@ -179,6 +217,16 @@ class VoiceService : Service(), OnNluResultListener {
         var bean = ChatListData(AppConstants.TYPE_AI_TEXT)
         bean.text = text
         addBaseText(bean)
+        VoiceManager.ttsStart(text)
+    }
+    /**
+     * 添加AI文本
+     */
+    private fun addAiText(text: String, mOnTTSResultListener: VoiceTTs.OnTTSResultListener) {
+        val bean = ChatListData(AppConstants.TYPE_AI_TEXT)
+        bean.text = text
+        addBaseText(bean)
+        VoiceManager.ttsStart(text, mOnTTSResultListener)
     }
     private fun addBaseText(bean:ChatListData){
         mChatList.add(bean)
@@ -191,5 +239,35 @@ class VoiceService : Service(), OnNluResultListener {
         L.i("更新提示语${text}")
         textViewTips.text=text
     }
+    private fun openApp(appName:String){
+        L.i("打开应用${appName}")
+        val isOpen = AppHelper.launcherApp(appName)
+        if (isOpen) {
+            addAiText(getString(R.string.text_voice_app_open, appName))
+        } else {
+            addAiText(getString(R.string.text_voice_app_not_open, appName))
+        }
+        hideWindow()
+    }
+    private fun deletedApp(appName: String) {
+        L.i("deletedApp:$appName")
+        val installApp = AppHelper.unInstallApp(appName)
+        if (installApp) {
+            addAiText(getString(R.string.text_voice_app_uninstall, appName))
+        } else {
+            addAiText(getString(R.string.text_voice_app_not_uninstall, appName))
+        }
+        hideWindow()
+    }
+    private fun otherApp(appName: String) {
+        //跳转应用商店
+        var isStore = AppHelper.launcherAppStore(appName)
+        if (isStore) {
+            addAiText(getString(R.string.text_voice_app_option, appName))
+        }else{
+            addAiText(WordsTools.noAnswerWords())
+        }
+    }
+
 
 }

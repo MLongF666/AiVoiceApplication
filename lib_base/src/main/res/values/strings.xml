@@ -115,6 +115,8 @@
         <item>com.hiapk.marketpho</item>
         <!--安智市场-->
         <item>cn.goapk.market</item>
+        <!-- realme 商城       -->
+        <item>com.heytap.market</item>
     </array>
 
     <!--热门城市-->
