@@ -14,7 +14,7 @@ object AppConfig{
     const val keyPassword="123456"
     const val keyAlias="key0"
     const val storePassword="123456"
-    const val storeFileUrl="/src/main/jks/aivoice.jks"
+    const val storeFileUrl="E:/Users/mlf/AndroidProjects/AiVoiceApplication/AiVoiceApplication/app/src/main/jks/aivoice.jks"
 }
 //Module配置
 object ModuleConfig{

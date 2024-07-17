@@ -1,4 +1,4 @@
-import org.jetbrains.kotlin.storage.CacheResetOnProcessCanceled.enabled
+
 
 plugins {
     alias(libs.plugins.android.library)
@@ -47,16 +47,17 @@ android {
 
 dependencies {
     api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    api(libs.mpandroidchart)
     //lottie
     api(libs.lottie)
     //viewpage
-    api("androidx.viewpager2:viewpager2:1.1.0")
+    api(libs.androidx.viewpager2)
     api(project(":lib_network"))
     api(project(":lib_voice"))
 
     //andpermission
 //    api(libs.andpermission)
-    api("com.yanzhenjie:permission:2.0.0")
+    api(libs.permission.v200)
     api(libs.recyclerview)
     //eventbus
     api(libs.events)
@@ -65,8 +66,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
-    api(files("libs\\BaiduLBS_Android.jar"))
-    api(files("libs\\IndoorscapeAlbumPlugin.jar"))
+    api(files("libs/BaiduLBS_Android.jar"))
+    api(files("libs/IndoorscapeAlbumPlugin.jar"))
     //运行时注解
     kapt(libs.arouter.compiler)
     api(libs.androidx.core.ktx)

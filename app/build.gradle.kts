@@ -1,5 +1,6 @@
 
 import com.android.build.gradle.internal.api.ApkVariantOutputImpl
+import com.android.build.gradle.internal.dsl.SigningConfig
 
 plugins {
     alias(libs.plugins.android.application)
@@ -41,7 +42,6 @@ android {
             keyAlias = AppConfig.keyAlias
             //别名密码
             keyPassword = AppConfig.keyPassword
-
         }
     }
 
@@ -49,12 +49,18 @@ android {
     //编译类型
     buildTypes {
         getByName("debug"){
-
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
         getByName("release"){
             isMinifyEnabled = false
             //自动打包
             signingConfig = signingConfigs.getByName("release")
+            println("signingConfig:"+ (signingConfig as SigningConfig).storeFile?.path)
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -88,7 +94,6 @@ dependencies {
     implementation(libs.material)
     implementation(project(":lib_base"))
     implementation(libs.androidx.activity)
-    implementation(files("libs\\Msc.jar"))
     if (!ModuleConfig.isApp) {
         implementation(project(":module_app_manager"))
         implementation(project(":module_constellation"))

@@ -18,6 +18,7 @@ import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.WindowsHelper
 import com.example.lib_base.helper.`fun`.AppHelper
+import com.example.lib_base.helper.`fun`.CommonSettingHelper
 import com.example.lib_base.utils.L
 import com.example.lib_voice.engine.VoiceEngineAnalyze
 import com.example.lib_voice.impl.OnAsrResultListener
@@ -155,7 +156,23 @@ class VoiceService : Service(), OnNluResultListener {
             val appName = VoiceAnalysisUtil.analysisApp(text)
             L.i("other AppName:$appName")
             otherApp(appName)
+        }else if(text.contains(Keyword.KEY_BACK)){
+            //去除标点符号
+            var valtext = VoiceAnalysisUtil.analysisPun(text)
+            if (valtext == Keyword.KEY_BACK){
+                L.i("返回操作")
+                addAiText(getString(R.string.text_voice_back_text))
+                CommonSettingHelper.back()
+            }else{
+                addAiText(WordsTools.noAnswerWords())
+            }
+
+        }else if (text.contains(Keyword.KEY_HOME)){
+            CommonSettingHelper.home()
         }
+        //返回
+        // 主页
+
 
 
     }

@@ -4,6 +4,7 @@ import android.app.IntentService
 import android.content.Intent
 import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.`fun`.AppHelper
+import com.example.lib_base.helper.`fun`.CommonSettingHelper
 import com.example.lib_base.utils.L
 import com.example.lib_base.utils.SpUtil
 import com.example.lib_voice.words.WordsTools
@@ -30,6 +31,7 @@ class InitService : IntentService(InitService::class.simpleName) {
         WordsTools.initTools(this)
         SoundPoolHelper.init(this)
         AppHelper.initHelper(this)
+        CommonSettingHelper.initHelper(this)
         L.i("执行初始化操作")
     }
 

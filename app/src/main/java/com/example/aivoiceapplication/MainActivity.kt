@@ -20,7 +20,7 @@ import com.example.lib_base.base.impl.OnItemClick
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
-import com.example.lib_network.interceptor.HttpManager
+import com.example.lib_network.HttpManager
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback

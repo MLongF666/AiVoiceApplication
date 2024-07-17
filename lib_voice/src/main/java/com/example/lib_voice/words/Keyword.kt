@@ -7,6 +7,8 @@ package com.example.lib_voice.words
  * @version: 1.0
  */
 object Keyword {
+    const val KEY_BACK = "返回"
+    const val KEY_HOME = "主页"
     const val KEY_WEATHER = "天气"
     const val KEY_OPEN_APP = "打开"
     const val KEY_CLOSE_APP = "关闭"

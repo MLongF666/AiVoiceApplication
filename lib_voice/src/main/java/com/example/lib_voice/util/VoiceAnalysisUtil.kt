@@ -25,7 +25,7 @@ object VoiceAnalysisUtil {
    }
     //去除标点符号方法
 
-    private fun analysisPun(text: String): String {
+    fun analysisPun(text: String): String {
         //去除标点符号
         val regex: String = "[^a-zA-Z0-9\\u4e00-\\u9fa5]"
         val result = text.replace(regex.toRegex(), "").toLowerCase()

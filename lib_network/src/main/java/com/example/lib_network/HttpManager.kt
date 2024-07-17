@@ -1,10 +1,12 @@
-package com.example.lib_network.interceptor
+package com.example.lib_network
 
+import com.example.lib_network.bean.WeatherDataBean
 import com.example.lib_network.http.HttpInterceptor
 import com.example.lib_network.http.HttpKey
 import com.example.lib_network.http.HttpUrl
 import com.example.lib_network.impl.HttpImpService
 import okhttp3.OkHttpClient
+import retrofit2.Callback
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -13,7 +15,6 @@ import retrofit2.converter.gson.GsonConverterFactory
  * @description: TODO 对外的网络管理类
  * @author:  mlf
  * @date:   2021/3/26 10:02
- * @email:  1737432505@qq.com
  */
 object HttpManager {
     //客户端
@@ -35,6 +36,7 @@ object HttpManager {
         retrofitWeather.create(HttpImpService::class.java)
     }
     //获取天气接口
-    fun queryWeather(city: String) = apiWeather.getWeather(city,HttpKey.WEATHER_KEY as String)
+    fun queryWeather(city: String,callback: Callback<WeatherDataBean>) =
+        apiWeather.getWeather(city,HttpKey.WEATHER_KEY as String).enqueue(callback)
 
 }
