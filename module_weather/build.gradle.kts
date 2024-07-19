@@ -1,11 +1,11 @@
 plugins {
-    if (ModuleConfig.isApp){
+    if(ModuleConfig.isApp){
         alias(libs.plugins.android.application)
     }else{
         alias(libs.plugins.android.library)
+
     }
     alias(libs.plugins.jetbrains.kotlin.android)
-//    alias(libs.plugins.kotlin.kapt)
     kotlin("kapt")
 
 }
@@ -16,21 +16,28 @@ android {
     buildFeatures {
         viewBinding = true
     }
-    defaultConfig {
-//        if (ModuleConfig.isApp) applicationId = ModuleConfig.MODULE_WEATHER
-        minSdk = 26
 
+    defaultConfig {
+//        if (ModuleConfig.isApp) {
+//            applicationId = ModuleConfig.MODULE_WEATHER
+//        }
+        minSdkVersion(AppConfig.minSdk)
+        targetSdkVersion(AppConfig.targetSdk)
+//        consumerProguardFiles("consumer-rules.pro")
+
+        //ARouter
         kapt {
             arguments {
                 arg("AROUTER_MODULE_NAME", project.name)
             }
         }
-//        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-//        consumerProguardFiles("consumer-rules.pro")
     }
     //动态替换资源
     sourceSets{
         getByName("main"){
+            assets {
+                srcDirs("src\\main\\manifest\\assets", "src\\main\\assets")
+            }
             if (ModuleConfig.isApp){
                 manifest.srcFile("src/main/manifest/AndroidManifest.xml")
             }else{

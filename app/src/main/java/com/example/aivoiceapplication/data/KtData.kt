@@ -14,4 +14,8 @@ data class ChatListData(
     val type:Int
 ){
     public lateinit var text: String
+    lateinit var wid:String
+    lateinit var info:String
+    lateinit var city:String
+    lateinit var temperature:String
 }

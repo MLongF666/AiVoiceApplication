@@ -22,6 +22,7 @@ android {
         targetSdk = AppConfig.targetSdk
         versionCode = AppConfig.versionCode
         versionName = AppConfig.versionName
+        buildToolsVersion=ModuleConfig.toolsVersion
 
         kapt {
             arguments {
@@ -91,9 +92,7 @@ android {
 
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-    implementation(libs.material)
     implementation(project(":lib_base"))
-    implementation(libs.androidx.activity)
     if (!ModuleConfig.isApp) {
         implementation(project(":module_app_manager"))
         implementation(project(":module_constellation"))

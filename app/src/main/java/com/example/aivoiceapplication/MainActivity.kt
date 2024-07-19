@@ -21,6 +21,7 @@ import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
 import com.example.lib_network.HttpManager
+import com.example.lib_network.bean.WeatherDataBean
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
@@ -50,15 +51,16 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun queryWater() {
-        HttpManager.queryWeather("平顶山").enqueue(object :Callback<ResponseBody>{
-            override fun onResponse(p0: Call<ResponseBody>, p1: Response<ResponseBody>) {
-                L.d("onResponse,${p1.body()?.string()}")
-            }
-
-            override fun onFailure(p0: Call<ResponseBody>, p1: Throwable) {
-                L.d("onFailure")
-            }
-        })
+//        HttpManager.queryWeather("平顶山",object : Callback<WeatherDataBean> {
+//            override fun onResponse(p0: Call<WeatherDataBean>, p1: Response<WeatherDataBean>) {
+//
+//            }
+//
+//            override fun onFailure(p0: Call<WeatherDataBean>, p1: Throwable) {
+//
+//            }
+//
+//        })
 
     }
 

@@ -1,10 +1,8 @@
 
-
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
-
 }
 
 android {
@@ -14,11 +12,11 @@ android {
         viewBinding = true
         dataBinding = true
     }
-//    dataBinding{
-//        enabled = true
-//    }
     defaultConfig {
-        minSdk = 26
+        namespace = "com.example.lib_base"
+        minSdkVersion(AppConfig.minSdk)
+        targetSdkVersion(AppConfig.targetSdk)
+        minSdk = AppConfig.minSdk
         consumerProguardFiles("consumer-rules.pro")
         kapt {
             arguments {
@@ -54,20 +52,15 @@ dependencies {
     api(libs.androidx.viewpager2)
     api(project(":lib_network"))
     api(project(":lib_voice"))
-
-    //andpermission
-//    api(libs.andpermission)
     api(libs.permission.v200)
     api(libs.recyclerview)
     //eventbus
     api(libs.events)
     //arouter
     api(libs.arouter)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    api(files("libs/BaiduLBS_Android.jar"))
-    api(files("libs/IndoorscapeAlbumPlugin.jar"))
+    api(libs.androidx.appcompat)
+    api(libs.material)
+    api(libs.androidx.activity)
     //运行时注解
     kapt(libs.arouter.compiler)
     api(libs.androidx.core.ktx)

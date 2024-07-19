@@ -1,11 +1,13 @@
 package com.example.aivoiceapplication.adapter
 
+import android.widget.ImageView
 import android.widget.TextView
 import com.example.aivoiceapplication.R
 import com.example.aivoiceapplication.data.ChatListData
 import com.example.aivoiceapplication.entity.AppConstants
 import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
+import com.example.module_weather.tools.WeatherIconTools
 
 /**
  * @description: TODO 聊天列表·适配器
@@ -25,6 +27,10 @@ class ChatListAdapter(data: List<ChatListData>) :
                 AppConstants.TYPE_MINE_TEXT -> viewHolder.getView<TextView>(R.id.tv_mine_content).text = model.text
                 AppConstants.TYPE_AI_TEXT -> viewHolder.getView<TextView>(R.id.tv_chat_ai).text = model.text
                 AppConstants.TYPE_WEATHER_TEXT -> {
+                    viewHolder.getView<TextView>(R.id.tv_city).text=model.city
+                    viewHolder.getView<TextView>(R.id.tv_info).text=model.info
+                    viewHolder.getView<TextView>(R.id.tv_temperature).text=model.temperature
+                    viewHolder.getView<ImageView>(R.id.iv_icon).setImageResource(WeatherIconTools.getIcon(model.wid))
                 }
             }
         }

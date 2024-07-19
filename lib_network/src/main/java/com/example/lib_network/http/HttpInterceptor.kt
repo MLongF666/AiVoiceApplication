@@ -21,7 +21,7 @@ class HttpInterceptor : Interceptor {
         }
         Log.i(TAG,"请求体：${request.body()}")
         Log.i(TAG,"============RESPONSE==============")
-        Log.i(TAG,"响应体：${response.body()?.string()}")
+//        Log.i(TAG,"响应体：${response.body()?.string()}")
 
         return response
     }

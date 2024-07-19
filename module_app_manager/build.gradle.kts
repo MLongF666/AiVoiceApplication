@@ -14,7 +14,7 @@ plugins {
 android {
     namespace =  ModuleConfig.MODULE_APP_MANAGER
     compileSdk = AppConfig.compileSdk
-    buildToolsVersion=ModuleConfig.buildToolsVersion
+    buildToolsVersion=ModuleConfig.toolsVersion
     buildFeatures {
         viewBinding = true
     }

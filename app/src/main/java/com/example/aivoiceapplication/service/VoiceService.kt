@@ -14,12 +14,15 @@ import com.example.aivoiceapplication.R
 import com.example.aivoiceapplication.adapter.ChatListAdapter
 import com.example.aivoiceapplication.data.ChatListData
 import com.example.aivoiceapplication.entity.AppConstants
+import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.WindowsHelper
 import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.helper.`fun`.CommonSettingHelper
 import com.example.lib_base.utils.L
+import com.example.lib_network.HttpManager
+import com.example.lib_network.bean.WeatherDataBean
 import com.example.lib_voice.engine.VoiceEngineAnalyze
 import com.example.lib_voice.impl.OnAsrResultListener
 import com.example.lib_voice.impl.OnNluResultListener
@@ -31,6 +34,9 @@ import com.example.lib_voice.words.WordsTools
 import com.iflytek.cloud.WakeuperResult
 
 import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 /**
  * @description: TODO 语音服务
@@ -85,7 +91,6 @@ class VoiceService : Service(), OnNluResultListener {
         VoiceManager.initManager(this,getExternalFilesDir("msc")?.absolutePath + "/ivw.wav" ,object : OnAsrResultListener {
             //准备就绪
             override fun weakUpReady() {
-                L.i("唤醒准备就绪")
                 VoiceManager.ttsStart("唤醒引擎准备就绪")
             }
 
@@ -121,8 +126,6 @@ class VoiceService : Service(), OnNluResultListener {
                 val text = nlu.optString("raw_text")
                 addMineText(text)
                 //识别指令
-                identifyCommand(text)
-
                 VoiceEngineAnalyze.analyzeNlu(nlu, this@VoiceService)
             }
 
@@ -131,55 +134,6 @@ class VoiceService : Service(), OnNluResultListener {
             }
         })
     }
-
-    //识别指令 启动 下载 卸载 升级
-    private fun identifyCommand(text: String) {
-        if (text.contains(Keyword.KEY_OPEN_APP)) {
-            val appName = VoiceAnalysisUtil.analysisOpenApp(text)
-            L.i("应用${appName}")
-            openApp(appName)
-
-        }
-        if (text.contains(Keyword.KEY_DELETE)){
-            val appName = VoiceAnalysisUtil.analysisDelete(text)
-            deletedApp(appName)
-        }
-        // const val KEY_UPDATE = "更新"
-        //    const val KEY_INSTALL = "安装"
-        //    const val KEY_DOWNLOAD = "下载"
-        //    //升级
-        //    const val KEY_UPGRADE = "升级"
-        else if (text.contains(Keyword.KEY_DOWNLOAD)||
-            text.contains(Keyword.KEY_UPDATE)||
-            text.contains(Keyword.KEY_INSTALL)||
-            text.contains(Keyword.KEY_UPGRADE)){
-            val appName = VoiceAnalysisUtil.analysisApp(text)
-            L.i("other AppName:$appName")
-            otherApp(appName)
-        }else if(text.contains(Keyword.KEY_BACK)){
-            //去除标点符号
-            var valtext = VoiceAnalysisUtil.analysisPun(text)
-            if (valtext == Keyword.KEY_BACK){
-                L.i("返回操作")
-                addAiText(getString(R.string.text_voice_back_text))
-                CommonSettingHelper.back()
-            }else{
-                addAiText(WordsTools.noAnswerWords())
-            }
-
-        }else if (text.contains(Keyword.KEY_HOME)){
-            CommonSettingHelper.home()
-        }
-        //返回
-        // 主页
-
-
-
-    }
-
-
-
-
     private fun wakeUpFix(result: WakeuperResult) {
         var text = result.resultString
         showWindow()
@@ -202,12 +156,51 @@ class VoiceService : Service(), OnNluResultListener {
             NotificationHelper.bindVoiceService("正在运行..."))
     }
 
-    override fun queryWeather(city: String, date: String) {
-        L.i("查询天气${city} ${date}")
+    override fun queryWeather(city: String) {
+        HttpManager.run {
+            queryWeather(city,object :Callback<WeatherDataBean>{
+                override fun onResponse(p0: Call<WeatherDataBean>, response: Response<WeatherDataBean>) {
+                    if (response.isSuccessful){
+                        response.body()?.let {
+                            it.result.realtime.apply {
+                                //填充数据
+                                addWeatherText(city, wid,info,temperature,object :VoiceTTs.OnTTSResultListener{
+                                    override fun onTTEnd() {
+                                        hideWindow()
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+
+                override fun onFailure(p0: Call<WeatherDataBean>, p1: Throwable) {
+                    addAiText("查询${city}的天气失败")
+                    hideWindow()
+                }
+            })
+        }
     }
+
+    override fun queryWeatherInfo(city: String) {
+        addAiText("正在为您查询:${city}的天气详情")
+        ARouterHelper.startActivity(ARouterHelper.PATH_WEATHER,"city",city)
+    }
+
 
     override fun nluError() {
         L.i("语义识别失败")
+    }
+
+    override fun openApp(appName: String) {
+        L.i("打开应用${appName}")
+        val isOpen = AppHelper.launcherApp(appName)
+        if (isOpen) {
+            addAiText(getString(R.string.text_voice_app_open, appName))
+        } else {
+            addAiText(getString(R.string.text_voice_app_not_open, appName))
+        }
+        hideWindow()
     }
 
     private fun showWindow(){
@@ -222,7 +215,20 @@ class VoiceService : Service(), OnNluResultListener {
             mLottieAnimationView.pauseAnimation()
             SoundPoolHelper.play(R.raw.record_over)
         },500)
+    }
 
+
+    //添加天气
+    private fun addWeatherText(city: String,info:String,temperature:String,wid: String,
+                               mOnTTSResultListener: VoiceTTs.OnTTSResultListener) {
+        var bean = ChatListData(AppConstants.TYPE_WEATHER_TEXT)
+        bean.city = city
+        bean.info = info
+        bean.temperature = temperature
+        bean.wid = wid
+        addBaseText(bean)
+        val text=city+"的天气"+info+temperature
+        VoiceManager.ttsStart(text, mOnTTSResultListener)
     }
 
     private fun addMineText(text:String){
@@ -256,17 +262,8 @@ class VoiceService : Service(), OnNluResultListener {
         L.i("更新提示语${text}")
         textViewTips.text=text
     }
-    private fun openApp(appName:String){
-        L.i("打开应用${appName}")
-        val isOpen = AppHelper.launcherApp(appName)
-        if (isOpen) {
-            addAiText(getString(R.string.text_voice_app_open, appName))
-        } else {
-            addAiText(getString(R.string.text_voice_app_not_open, appName))
-        }
-        hideWindow()
-    }
-    private fun deletedApp(appName: String) {
+
+    override fun unInstallApp(appName: String) {
         L.i("deletedApp:$appName")
         val installApp = AppHelper.unInstallApp(appName)
         if (installApp) {
@@ -276,7 +273,7 @@ class VoiceService : Service(), OnNluResultListener {
         }
         hideWindow()
     }
-    private fun otherApp(appName: String) {
+    override fun otherApp(appName: String) {
         //跳转应用商店
         var isStore = AppHelper.launcherAppStore(appName)
         if (isStore) {
@@ -284,6 +281,62 @@ class VoiceService : Service(), OnNluResultListener {
         }else{
             addAiText(WordsTools.noAnswerWords())
         }
+    }
+
+    override fun back(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun home(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun setVolumeUp(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun setVolumeDown(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun quit(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun callPhoneForName(name: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun callPhoneForNumber(phone: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun playJoke(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun jokeList(): Any? {
+        TODO("Not yet implemented")
+    }
+
+    override fun conTellTime(word: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun conTellInfo(word: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun routeMap(word: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun nearByMap(word: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun aiRobot(string: String) {
+        TODO("Not yet implemented")
     }
 
 

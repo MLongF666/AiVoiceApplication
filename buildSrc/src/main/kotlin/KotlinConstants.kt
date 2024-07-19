@@ -21,7 +21,7 @@ object ModuleConfig{
     //是否App
     var isApp=false
     //编译工具版本
-    const val buildToolsVersion = "34.0.0"
+    const val toolsVersion = "34.0.0"
     //包名
     const val MODULE_APP_MANAGER="com.example.module_app_manager"
     const val MODULE_CONSTELLATION="com.example.module_constellation"

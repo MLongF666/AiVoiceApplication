@@ -30,6 +30,9 @@ android {
     //动态替换资源
     sourceSets{
         getByName("main"){
+            assets {
+                srcDirs("src\\main\\manifest\\assets", "src\\main\\assets")
+            }
             if (ModuleConfig.isApp){
                 manifest.srcFile("src/main/manifest/AndroidManifest.xml")
             }else{

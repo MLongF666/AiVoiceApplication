@@ -37,6 +37,7 @@ object HttpManager {
     }
     //获取天气接口
     fun queryWeather(city: String,callback: Callback<WeatherDataBean>) =
-        apiWeather.getWeather(city,HttpKey.WEATHER_KEY as String).enqueue(callback)
+        apiWeather.getWeather(city,HttpKey.WEATHER_KEY).enqueue(callback)
+    //
 
 }

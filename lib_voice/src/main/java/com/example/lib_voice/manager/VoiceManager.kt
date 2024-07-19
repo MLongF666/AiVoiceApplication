@@ -117,7 +117,7 @@ object VoiceManager :EventListener, WakeuperListener {
         Log.d(TAG, "onEvent: $name $params $byte $offset $length")
         //语音前置状态
         when (name) {
-            SpeechConstant.CALLBACK_EVENT_WAKEUP_READY -> mOnAsrResultListener.weakUpReady()
+//            SpeechConstant.CALLBACK_EVENT_WAKEUP_READY -> mOnAsrResultListener.weakUpReady()
             SpeechConstant.CALLBACK_EVENT_ASR_BEGIN -> mOnAsrResultListener.asrStartSpeak()
             SpeechConstant.CALLBACK_EVENT_ASR_END -> mOnAsrResultListener.asrStopSpeak()
         }

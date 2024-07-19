@@ -14,5 +14,6 @@ package com.example.lib_network.http
 
 object HttpUrl {
     const val WEATHER_BASE_URL = "http://apis.juhe.cn/"
+    //天气查询
     const val WEATHER_ACTION="simpleWeather/query"
 }

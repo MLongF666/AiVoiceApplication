@@ -32,12 +32,8 @@ android {
 }
 
 dependencies {
+    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     api(libs.retrofit)
     api(libs.retrofit.gson)
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
+
 }

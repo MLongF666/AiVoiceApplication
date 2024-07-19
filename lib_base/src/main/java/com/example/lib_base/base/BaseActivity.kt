@@ -7,9 +7,11 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
+import com.example.lib_base.R
 import com.yanzhenjie.permission.Action
 import com.yanzhenjie.permission.AndPermission
 import java.security.Permission
@@ -36,8 +38,10 @@ abstract class BaseActivity<T: ViewBinding > : AppCompatActivity() {
             //设置标题 如果getTitleText不为空就赋值给title
             supportActionBar?.let {
                 it.title=getTitleText()
-                it.setDisplayShowHomeEnabled(isShowBack())
                 it.elevation=0f
+                it.setHomeButtonEnabled(isShowBack())
+                it.setDisplayHomeAsUpEnabled(isShowBack())
+
             }
         }
         initView()
