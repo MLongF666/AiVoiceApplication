@@ -164,7 +164,7 @@ class VoiceService : Service(), OnNluResultListener {
                         response.body()?.let {
                             it.result.realtime.apply {
                                 //填充数据
-                                addWeatherText(city, wid,info,temperature,object :VoiceTTs.OnTTSResultListener{
+                                addWeatherText(city,info,temperature,wid,object :VoiceTTs.OnTTSResultListener{
                                     override fun onTTEnd() {
                                         hideWindow()
                                     }
@@ -190,6 +190,8 @@ class VoiceService : Service(), OnNluResultListener {
 
     override fun nluError() {
         L.i("语义识别失败")
+        addAiText(WordsTools.noSupportWords())
+        hideWindow()
     }
 
     override fun openApp(appName: String) {
@@ -224,10 +226,10 @@ class VoiceService : Service(), OnNluResultListener {
         var bean = ChatListData(AppConstants.TYPE_WEATHER_TEXT)
         bean.city = city
         bean.info = info
-        bean.temperature = temperature
+        bean.temperature = "$temperature°C"
         bean.wid = wid
         addBaseText(bean)
-        val text=city+"的天气"+info+temperature
+        val text=city+"的天气"+info+temperature+"°C"
         VoiceManager.ttsStart(text, mOnTTSResultListener)
     }
 
@@ -283,8 +285,9 @@ class VoiceService : Service(), OnNluResultListener {
         }
     }
 
-    override fun back(): Any? {
-        TODO("Not yet implemented")
+    override fun back(){
+        L.i("返回back")
+        CommonSettingHelper.back()
     }
 
     override fun home(): Any? {

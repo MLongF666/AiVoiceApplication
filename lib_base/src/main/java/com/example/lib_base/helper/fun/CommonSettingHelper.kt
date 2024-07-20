@@ -21,11 +21,8 @@ object CommonSettingHelper {
 
     //返回
     fun back(){
-       Thread {
-           Log.d("CommonSettingHelper", "back")
-           mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK)
-       }.start()
-
+        Log.d("CommonSettingHelper", "back")
+       Thread { mInstrumentation.sendKeyDownUpSync(KeyEvent.KEYCODE_BACK) }.start()
     }
     //主页
     fun home(){

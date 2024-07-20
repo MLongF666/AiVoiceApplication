@@ -16,7 +16,10 @@ interface OnNluResultListener {
     fun openApp(word: String)
     fun unInstallApp(word: String)
     fun otherApp(word: String)
-    fun back(): Any?
+    //通用设置
+    //返回
+    fun back()
+    //主页
     fun home(): Any?
     fun setVolumeUp(): Any?
     fun setVolumeDown(): Any?

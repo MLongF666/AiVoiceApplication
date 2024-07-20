@@ -1,4 +1,5 @@
 [versions]
+autosize = "1.2.1"
 gradle = "4.2.2"
 permission = "2.0.0"
 viewpager2 = "1.1.0"
@@ -20,6 +21,7 @@ lifecycleLivedataKtx = "2.8.2"
 lifecycleViewmodelKtx = "2.8.2"
 [libraries]
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
+autosize = { module = "me.jessyan:autosize", version.ref = "autosize" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 lottie = { group = "com.airbnb.android", name = "lottie", version = "4.2.2" }
 #viewpager = { group = "com.zhy", name = "magic-viewpager", version = "1.0.1" }

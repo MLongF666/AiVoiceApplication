@@ -67,6 +67,7 @@ dependencies {
     api(libs.androidx.appcompat)
     api(libs.androidx.constraintlayout)
     api(libs.material)
+    api(libs.autosize)
 //    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
