@@ -20,6 +20,7 @@ import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.WindowsHelper
 import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.helper.`fun`.CommonSettingHelper
+import com.example.lib_base.helper.`fun`.ContactHelper
 import com.example.lib_base.utils.L
 import com.example.lib_network.HttpManager
 import com.example.lib_network.bean.WeatherDataBean
@@ -306,12 +307,34 @@ class VoiceService : Service(), OnNluResultListener {
         TODO("Not yet implemented")
     }
 
+    //拨打联系人
     override fun callPhoneForName(name: String) {
-        TODO("Not yet implemented")
-    }
 
+        addAiText("正在为您拨打联系人:$name",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                var list =ContactHelper.getContactList().filter {
+                    it.phoneName == name
+                }
+                if (list.isNotEmpty()) {
+                    L.i("拨打联系人列表${list}")
+                    ContactHelper.callPhone(list[0].phoneNumber)
+                }else{
+                    addAiText(getString(R.string.text_voice_no_friend))
+                }
+                hideWindow()
+            }
+
+        })
+    }
+    //拨打号码
     override fun callPhoneForNumber(phone: String) {
-        TODO("Not yet implemented")
+        addAiText("正在为您拨打号码:$phone",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                ContactHelper.callPhone(phone)
+                hideWindow()
+            }
+
+        })
     }
 
     override fun playJoke(): Any? {

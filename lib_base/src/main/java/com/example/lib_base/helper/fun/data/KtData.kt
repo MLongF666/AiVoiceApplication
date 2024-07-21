@@ -17,3 +17,8 @@ data class AppData(
     val firstRunName: String,
     val isSystemApp: Boolean
 )
+//联系人
+data class ContactData(
+    val phoneName: String,
+    val phoneNumber: String
+)

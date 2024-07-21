@@ -18,6 +18,7 @@ import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.base.impl.OnItemClick
 import com.example.lib_base.helper.ARouterHelper
+import com.example.lib_base.helper.`fun`.ContactHelper
 import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
 import com.example.lib_network.HttpManager
@@ -30,7 +31,11 @@ import retrofit2.Response
 
 class MainActivity : BaseActivity<ActivityMainBinding>() {
 //    private val WINDOW_PERMISSION=1000
-
+    private val permissions = arrayOf(
+    Manifest.permission.RECORD_AUDIO,
+    Manifest.permission.CALL_PHONE,
+    Manifest.permission.READ_CONTACTS
+    )
     private var arrayList = ArrayList<String>()
     private var mList = ArrayList<MainListData>()
     private var mViewList = ArrayList<View>()
@@ -73,11 +78,12 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     override fun initView() {
+
         //动态权限
-        if (checkPermission(Manifest.permission.RECORD_AUDIO)){
+        if (checkPermission(permissions)){
             linkService()
         }else{
-            requestPermission(arrayOf(Manifest.permission.RECORD_AUDIO)
+            requestPermission(permissions
             ) { linkService() }
         }
         //窗口权限
@@ -176,6 +182,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun linkService() {
+        ContactHelper.init(this)
         startService(Intent(this, VoiceService::class.java))
     }
 

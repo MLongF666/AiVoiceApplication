@@ -24,7 +24,9 @@ interface OnNluResultListener {
     fun setVolumeUp(): Any?
     fun setVolumeDown(): Any?
     fun quit(): Any?
+    //按照名字拨打电话
     fun callPhoneForName(name: String)
+    //按照号码拨打电话
     fun callPhoneForNumber(phone: String)
     fun playJoke(): Any?
     fun jokeList(): Any?
