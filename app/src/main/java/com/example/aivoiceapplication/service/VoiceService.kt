@@ -23,6 +23,7 @@ import com.example.lib_base.helper.`fun`.CommonSettingHelper
 import com.example.lib_base.helper.`fun`.ContactHelper
 import com.example.lib_base.utils.L
 import com.example.lib_network.HttpManager
+import com.example.lib_network.bean.JokeDataBean
 import com.example.lib_network.bean.WeatherDataBean
 import com.example.lib_voice.engine.VoiceEngineAnalyze
 import com.example.lib_voice.impl.OnAsrResultListener
@@ -106,11 +107,16 @@ class VoiceService : Service(), OnNluResultListener {
 
             override fun weakUpSuccess(result: JSONObject) {
                 L.i("唤醒成功${result}")
+                val errorCode = result.optInt("errorCode")
+                if (errorCode == 0) {
+                    //唤醒成功
+                    wakeUpFix()
+                }
             }
 
             //科大讯飞唤醒成功
             override fun weakUpSuccess(result: WakeuperResult) {
-                wakeUpFix(result)
+                wakeUpFix()
             }
 
             override fun weakUpError(text: String) {
@@ -135,8 +141,7 @@ class VoiceService : Service(), OnNluResultListener {
             }
         })
     }
-    private fun wakeUpFix(result: WakeuperResult) {
-        var text = result.resultString
+    private fun wakeUpFix() {
         showWindow()
         updateTips(getString(R.string.text_voice_wakeup_tips))
         //应答
@@ -224,7 +229,7 @@ class VoiceService : Service(), OnNluResultListener {
     //添加天气
     private fun addWeatherText(city: String,info:String,temperature:String,wid: String,
                                mOnTTSResultListener: VoiceTTs.OnTTSResultListener) {
-        var bean = ChatListData(AppConstants.TYPE_WEATHER_TEXT)
+        val bean = ChatListData(AppConstants.TYPE_WEATHER_TEXT)
         bean.city = city
         bean.info = info
         bean.temperature = "$temperature°C"
@@ -235,12 +240,12 @@ class VoiceService : Service(), OnNluResultListener {
     }
 
     private fun addMineText(text:String){
-        var bean = ChatListData(AppConstants.TYPE_MINE_TEXT)
+        val bean = ChatListData(AppConstants.TYPE_MINE_TEXT)
         bean.text=text
         addBaseText(bean)
     }
     private fun addAiText(text: String) {
-        var bean = ChatListData(AppConstants.TYPE_AI_TEXT)
+        val bean = ChatListData(AppConstants.TYPE_AI_TEXT)
         bean.text = text
         addBaseText(bean)
         VoiceManager.ttsStart(text)
@@ -309,22 +314,18 @@ class VoiceService : Service(), OnNluResultListener {
 
     //拨打联系人
     override fun callPhoneForName(name: String) {
-
-        addAiText("正在为您拨打联系人:$name",object :VoiceTTs.OnTTSResultListener{
-            override fun onTTEnd() {
-                var list =ContactHelper.getContactList().filter {
-                    it.phoneName == name
-                }
-                if (list.isNotEmpty()) {
-                    L.i("拨打联系人列表${list}")
+        var list =ContactHelper.getContactList().filter { it.phoneName == name}
+        if (list.isNotEmpty()) {
+            L.i("拨打联系人列表${list}")
+            addAiText("正在为您拨打联系人:$name",object :VoiceTTs.OnTTSResultListener{
+                override fun onTTEnd() {
                     ContactHelper.callPhone(list[0].phoneNumber)
-                }else{
-                    addAiText(getString(R.string.text_voice_no_friend))
                 }
-                hideWindow()
-            }
-
-        })
+            })
+        }else{
+            addAiText(getString(R.string.text_voice_no_friend))
+        }
+        hideWindow()
     }
     //拨打号码
     override fun callPhoneForNumber(phone: String) {
@@ -337,12 +338,38 @@ class VoiceService : Service(), OnNluResultListener {
         })
     }
 
-    override fun playJoke(): Any? {
-        TODO("Not yet implemented")
+    //播放笑话
+    override fun playJoke(){
+        L.i("播放笑话")
+        HttpManager.getJoke(object :Callback<JokeDataBean>{
+            override fun onResponse(p0: Call<JokeDataBean>, p1: Response<JokeDataBean>) {
+                p1.body()?.let {
+                    if (it.code==200){
+                        val item = it.result.list[0]
+                        L.i("笑话内容${item.content}")
+                        addAiText(item.content,object :VoiceTTs.OnTTSResultListener{
+                            override fun onTTEnd() {
+                                hideWindow()
+                            }
+                        })
+                    }else{
+                        jokeError()
+                    }
+                }
+            }
+
+            override fun onFailure(p0: Call<JokeDataBean>, p1: Throwable) {
+                L.i("笑话列表失败${p1.message}")
+                jokeError()
+            }
+
+        })
     }
 
-    override fun jokeList(): Any? {
-        TODO("Not yet implemented")
+    override fun jokeList(){
+        addAiText("正在为您搜索笑话")
+        ARouterHelper.startActivity(ARouterHelper.PATH_JOKE)
+        hideWindow()
     }
 
     override fun conTellTime(word: String) {
@@ -365,5 +392,8 @@ class VoiceService : Service(), OnNluResultListener {
         TODO("Not yet implemented")
     }
 
-
+    private fun jokeError(){
+        addAiText(getString(R.string.text_voice_query_joke_error))
+        hideWindow()
+    }
 }

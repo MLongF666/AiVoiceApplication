@@ -16,7 +16,7 @@ import com.example.lib_voice.manager.VoiceManager
  */
 object VoiceTTs : SpeechSynthesizerListener {
     private var TAG=VoiceTTs::class.java.simpleName
-    private lateinit var mSpeechSynthesizer: SpeechSynthesizer;
+    private lateinit var mSpeechSynthesizer: SpeechSynthesizer
     private var mListener:OnTTSResultListener?=null
     //初始化tts
     fun initTTS(mContext: Context){
@@ -30,36 +30,34 @@ object VoiceTTs : SpeechSynthesizerListener {
             VoiceManager.VOICE_APP_SECRET)
         //设置监听
         mSpeechSynthesizer.setSpeechSynthesizerListener(this)
-        //其他参数
-        //发声人
-        setPeople(5118)
-        //语速
-        setSpeed(6)
-        //音量
-        setVolume(15)
         //初始化
         mSpeechSynthesizer.initTts(TtsMode.ONLINE)
+        //        //发声人
+//        setPeople(5118)
+//        //语速
+//        setSpeed(6)
+//        //音量
+//        setVolume(15)
     }
 
     override fun onSynthesizeStart(p0: String?) {
-        Log.d(TAG, "onSynthesizeStart: ")
-
+        Log.d(TAG, "onSynthesizeStart: $p0 合成开始")
     }
 
     override fun onSynthesizeDataArrived(p0: String?, p1: ByteArray?, p2: Int, p3: Int) {
-        Log.d(TAG, "onSynthesizeDataArrived: 合成开始")
+
     }
 
     override fun onSynthesizeFinish(p0: String?) {
-        Log.d(TAG, "onSynthesizeFinish: 结束")
+        Log.d(TAG, "合成结束")
     }
 
     override fun onSpeechStart(p0: String?) {
-        Log.d(TAG, "onSpeechStart: ")
+        Log.d(TAG, "开始播放：${p0.toString()}")
     }
 
     override fun onSpeechProgressChanged(p0: String?, p1: Int) {
-        Log.d(TAG, "onSpeechProgressChanged: ")
+        Log.d(TAG, "onSpeechProgressChanged: $p0, $p1")
     }
 
     override fun onSpeechFinish(p0: String?) {
@@ -72,13 +70,10 @@ object VoiceTTs : SpeechSynthesizerListener {
     override fun onError(p0: String?, p1: SpeechError?) {
         Log.d(TAG, "onError: $p1 $p0")
     }
-//    //播放
-//    fun start(text:String){
-//        mSpeechSynthesizer.speak(text)
-//    }
     //播放并且有回调
     fun start(text:String, mListener: OnTTSResultListener?){
         this.mListener=mListener
+        Log.d(TAG, "onStart: $text")
         mSpeechSynthesizer.speak(text)
     }
     //暂停

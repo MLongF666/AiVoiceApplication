@@ -25,6 +25,7 @@
             android:name="org.apache.http.legacy"
             android:required="false"/>
         <activity
+            android:launchMode="singleTop"
             android:name=".MainActivity"
             android:exported="true"
             tools:ignore="MissingClass">

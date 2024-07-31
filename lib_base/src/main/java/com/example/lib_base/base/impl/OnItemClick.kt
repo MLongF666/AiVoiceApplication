@@ -1,6 +1,7 @@
 package com.example.lib_base.base.impl
 
 import android.view.View
+import com.example.lib_base.base.adapter.CommonViewHolder
 
 /**
  * @description: TODO

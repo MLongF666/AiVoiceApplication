@@ -17,8 +17,8 @@ open class CommonViewHolder(itemView: View):
         private var sparseArray = SparseArray<View>()
     companion object {
         fun getViewHolder(parent: ViewGroup, layoutId: Int): CommonViewHolder {
-            var itemView = LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
-            var viewHolder = CommonViewHolder(
+            val itemView = LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
+            val viewHolder = CommonViewHolder(
                 itemView
             )
             return viewHolder

@@ -32,18 +32,18 @@ object VoiceManager :EventListener, WakeuperListener {
         // 初始化语音管理类
         VoiceTTs.initTTS(mContext)
         VoiceAsr.initAsr(mContext,this)
-        IFVoiceWakeUp.initWakeUp(mContext,ivmPath,this)
+//        IFVoiceWakeUp.initWakeUp(mContext,ivmPath,this)
         VoiceWakeUp.initWakeUp(mContext,this)
     }
     //tts start
     //播放
     fun ttsStart(text:String){
-        Log.d(TAG, "ttsStart: $text")
+        Log.d(TAG, "开始TTS-：$text")
         VoiceTTs.start(text,null)
     }
     //播放且有回调
     fun ttsStart(text:String,mListener:VoiceTTs.OnTTSResultListener){
-        Log.d(TAG, "ttsStart--: $text")
+        Log.d(TAG, "开始TTS-：$text")
         VoiceTTs.start(text,mListener)
     }
     //暂停
@@ -117,7 +117,7 @@ object VoiceManager :EventListener, WakeuperListener {
         Log.d(TAG, "onEvent: $name $params $byte $offset $length")
         //语音前置状态
         when (name) {
-//            SpeechConstant.CALLBACK_EVENT_WAKEUP_READY -> mOnAsrResultListener.weakUpReady()
+            SpeechConstant.CALLBACK_EVENT_WAKEUP_READY -> mOnAsrResultListener.weakUpReady()
             SpeechConstant.CALLBACK_EVENT_ASR_BEGIN -> mOnAsrResultListener.asrStartSpeak()
             SpeechConstant.CALLBACK_EVENT_ASR_END -> mOnAsrResultListener.asrStopSpeak()
         }
@@ -145,7 +145,7 @@ object VoiceManager :EventListener, WakeuperListener {
 
     override fun onBeginOfSpeech() {
         Log.d("IFVoiceWakeUp", "onBeginOfSpeech: ")
-        mOnAsrResultListener.weakUpReady()
+//        mOnAsrResultListener.weakUpReady()
     }
 
     override fun onResult(p0: WakeuperResult?) {

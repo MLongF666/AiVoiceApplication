@@ -28,8 +28,10 @@ interface OnNluResultListener {
     fun callPhoneForName(name: String)
     //按照号码拨打电话
     fun callPhoneForNumber(phone: String)
-    fun playJoke(): Any?
-    fun jokeList(): Any?
+    //播放笑话
+    fun playJoke()
+    //笑话列表
+    fun jokeList()
     fun conTellTime(word: String)
     fun conTellInfo(word: String)
     fun routeMap(word: String)

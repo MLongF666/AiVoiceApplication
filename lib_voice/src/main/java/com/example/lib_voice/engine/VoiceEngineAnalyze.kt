@@ -162,7 +162,9 @@ object VoiceEngineAnalyze {
                     }
                 }
                 NluWords.NLU_SEARCH, NluWords.NLU_NOVEL -> {
-                    if (intent == NluWords.INTENT_SEARCH) {
+                    if (intent == NluWords.INTENT_SEARCH
+                        || intent == NluWords.INTENT_SEARCH_JOKE
+                        || intent == NluWords.INTENT_SEARCH_NOVEL) {
                         mOnNluResultListener.jokeList()
                     } else {
                         mOnNluResultListener.nluError()

@@ -34,7 +34,7 @@ open class CommonAdapter<T> : RecyclerView.Adapter<CommonViewHolder> {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int):
             CommonViewHolder {
-        var layoutId = onBindDataListener?.getLayoutId(viewType)
+        val layoutId = onBindDataListener?.getLayoutId(viewType)
         return CommonViewHolder.getViewHolder(parent,layoutId!!)
 
     }

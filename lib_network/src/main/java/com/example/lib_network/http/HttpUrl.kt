@@ -16,4 +16,8 @@ object HttpUrl {
     const val WEATHER_BASE_URL = "http://apis.juhe.cn/"
     //天气查询
     const val WEATHER_ACTION="simpleWeather/query"
+
+    const val JOKE_BASE_URL = "https://apis.tianapi.com/"
+
+    const val JOKE_ACTION="joke/index"
 }
