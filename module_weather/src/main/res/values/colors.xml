@@ -12,4 +12,5 @@
     <color name="colorAccent">#03DAC5</color>
     <color name="alpha">#00000000</color>
     <color name="background">#636060</color>
+    <color name="title_select_city">#A4A4A4</color>
 </resources>

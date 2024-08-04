@@ -2,9 +2,13 @@ package com.example.lib_base.service
 
 import android.app.IntentService
 import android.content.Intent
+import android.os.Build
+import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.helper.`fun`.CommonSettingHelper
+import com.example.lib_base.helper.`fun`.ConsTellHelper
+import com.example.lib_base.utils.AssetUtils
 import com.example.lib_base.utils.L
 import com.example.lib_base.utils.SpUtil
 import com.example.lib_voice.words.WordsTools
@@ -19,19 +23,22 @@ class InitService : IntentService(InitService::class.simpleName) {
     override fun onCreate() {
         super.onCreate()
         L.i("初始化开始")
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            startForeground(999, NotificationHelper.bindInitService("正在运行"))
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForeground(999, NotificationHelper.bindInitService("正在运行"))
+        }
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         return super.onStartCommand(intent, flags, startId)
     }
+    @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {
         SpUtil.init(this)
         WordsTools.initTools(this)
         SoundPoolHelper.init(this)
         AppHelper.initHelper(this)
         CommonSettingHelper.initHelper(this)
+        ConsTellHelper.initHelper(this)
+        AssetUtils.initUtils(this)
         L.i("执行初始化操作")
     }
 

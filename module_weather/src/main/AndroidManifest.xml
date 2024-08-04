@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <application
-        android:usesCleartextTraffic="true">
+
+    <application android:usesCleartextTraffic="true">
         <activity
-            android:name=".WeatherActivity"
-            android:exported="true" />
+            android:launchMode="standard"
+            android:name=".ui.CityActivity"/>
+        <activity
+            android:launchMode="singleTop"
+            android:name=".WeatherActivity"/>
     </application>
 
 </manifest>

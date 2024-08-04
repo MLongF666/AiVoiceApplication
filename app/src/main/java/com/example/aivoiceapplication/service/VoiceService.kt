@@ -20,9 +20,11 @@ import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.WindowsHelper
 import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.helper.`fun`.CommonSettingHelper
+import com.example.lib_base.helper.`fun`.ConsTellHelper
 import com.example.lib_base.helper.`fun`.ContactHelper
 import com.example.lib_base.utils.L
 import com.example.lib_network.HttpManager
+import com.example.lib_network.bean.AiRootBean
 import com.example.lib_network.bean.JokeDataBean
 import com.example.lib_network.bean.WeatherDataBean
 import com.example.lib_voice.engine.VoiceEngineAnalyze
@@ -30,10 +32,7 @@ import com.example.lib_voice.impl.OnAsrResultListener
 import com.example.lib_voice.impl.OnNluResultListener
 import com.example.lib_voice.manager.VoiceManager
 import com.example.lib_voice.tts.VoiceTTs
-import com.example.lib_voice.util.VoiceAnalysisUtil
-import com.example.lib_voice.words.Keyword
 import com.example.lib_voice.words.WordsTools
-import com.iflytek.cloud.WakeuperResult
 
 import org.json.JSONObject
 import retrofit2.Call
@@ -114,11 +113,6 @@ class VoiceService : Service(), OnNluResultListener {
                 }
             }
 
-            //科大讯飞唤醒成功
-            override fun weakUpSuccess(result: WakeuperResult) {
-                wakeUpFix()
-            }
-
             override fun weakUpError(text: String) {
                 L.i("唤醒失败${text}")
                 hideWindow()
@@ -128,12 +122,12 @@ class VoiceService : Service(), OnNluResultListener {
                 L.i("在线识别结果${result}")
             }
 
-            override fun nluResult(nlu: JSONObject) {
-                L.i("语义识别结果${nlu}")
-                val text = nlu.optString("raw_text")
+            override fun nluResult(result: JSONObject) {
+                L.i("语义识别结果${result}")
+                val text = result.optString("raw_text")
                 addMineText(text)
                 //识别指令
-                VoiceEngineAnalyze.analyzeNlu(nlu, this@VoiceService)
+                VoiceEngineAnalyze.analyzeNlu(result, this@VoiceService)
             }
 
             override fun updateUserText(text: String) {
@@ -189,8 +183,13 @@ class VoiceService : Service(), OnNluResultListener {
     }
 
     override fun queryWeatherInfo(city: String) {
-        addAiText("正在为您查询:${city}的天气详情")
+        addAiText("正在为您查询:${city}的天气详情",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                hideWindow()
+            }
+        })
         ARouterHelper.startActivity(ARouterHelper.PATH_WEATHER,"city",city)
+
     }
 
 
@@ -373,11 +372,19 @@ class VoiceService : Service(), OnNluResultListener {
     }
 
     override fun conTellTime(word: String) {
-        TODO("Not yet implemented")
+        L.i("查询时间${word}")
+        val tellTime = ConsTellHelper.getConsTellTime(word)
+        addAiText(tellTime,object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                hideWindow()
+            }
+
+        })
     }
 
     override fun conTellInfo(word: String) {
-        TODO("Not yet implemented")
+        L.i("查询信息${word}")
+        ARouterHelper.startActivity(ARouterHelper.PATH_CONSTELLATION,"word",word)
     }
 
     override fun routeMap(word: String) {
@@ -389,7 +396,25 @@ class VoiceService : Service(), OnNluResultListener {
     }
 
     override fun aiRobot(string: String) {
-        TODO("Not yet implemented")
+        //请求机器人回答
+        HttpManager.queryRobot(string,object :Callback<AiRootBean>{
+            override fun onResponse(p0: Call<AiRootBean>, p1: Response<AiRootBean>) {
+                p1.body()?.let {
+                    L.i("机器人回答${it.content}")
+                        addAiText(it.content,object :VoiceTTs.OnTTSResultListener{
+                            override fun onTTEnd() {
+                                hideWindow()
+                            }
+                        })
+                }
+            }
+
+            override fun onFailure(p0: Call<AiRootBean>, p1: Throwable) {
+                L.e("机器人请求失败${p1.message}")
+            }
+
+        })
+
     }
 
     private fun jokeError(){

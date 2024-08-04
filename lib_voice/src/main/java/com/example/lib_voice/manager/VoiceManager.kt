@@ -1,25 +1,20 @@
 package com.example.lib_voice.manager
 
 import android.content.Context
-import android.os.Bundle
 import android.util.Log
 import com.baidu.speech.EventListener
 import com.baidu.speech.asr.SpeechConstant
 import com.example.lib_voice.asr.VoiceAsr
 import com.example.lib_voice.impl.OnAsrResultListener
 import com.example.lib_voice.tts.VoiceTTs
-import com.example.lib_voice.wakeup.IFVoiceWakeUp
 import com.example.lib_voice.wakeup.VoiceWakeUp
-import com.iflytek.cloud.SpeechError
-import com.iflytek.cloud.WakeuperListener
-import com.iflytek.cloud.WakeuperResult
 import org.json.JSONObject
 
 
 /**
  * 语音管理类
  */
-object VoiceManager :EventListener, WakeuperListener {
+object VoiceManager :EventListener {
     private  var  TAG=VoiceManager::class.java.simpleName
     //接口
     private lateinit var mOnAsrResultListener:OnAsrResultListener
@@ -32,7 +27,6 @@ object VoiceManager :EventListener, WakeuperListener {
         // 初始化语音管理类
         VoiceTTs.initTTS(mContext)
         VoiceAsr.initAsr(mContext,this)
-//        IFVoiceWakeUp.initWakeUp(mContext,ivmPath,this)
         VoiceWakeUp.initWakeUp(mContext,this)
     }
     //tts start
@@ -98,15 +92,7 @@ object VoiceManager :EventListener, WakeuperListener {
     fun releaseAsr(){
         VoiceAsr.releaseAsr(this)
     }
-    //if stop
-    fun ifStop(){
-        IFVoiceWakeUp.stopWakeUp()
-    }
-    //if start
-    fun ifStart(){
-        IFVoiceWakeUp.startWakeUp(this)
-    }
-    //if end
+
 
 
 
@@ -141,32 +127,6 @@ object VoiceManager :EventListener, WakeuperListener {
                 }
             }
         }
-    }
-
-    override fun onBeginOfSpeech() {
-        Log.d("IFVoiceWakeUp", "onBeginOfSpeech: ")
-//        mOnAsrResultListener.weakUpReady()
-    }
-
-    override fun onResult(p0: WakeuperResult?) {
-        Log.d("IFVoiceWakeUp", "onResult: $p0")
-//        mOnAsrResultListener.weakUpReady()
-        // 唤醒成功，可以开始识别
-        mOnAsrResultListener.weakUpSuccess(p0!!)
-
-    }
-
-    override fun onError(p0: SpeechError?) {
-        mOnAsrResultListener.weakUpError("唤醒失败")
-        Log.d("IFVoiceWakeUp", "onError: ")
-    }
-
-    override fun onEvent(p0: Int, p1: Int, p2: Int, p3: Bundle?) {
-        Log.d("IFVoiceWakeUp", "IFonEvent: ")
-    }
-
-    override fun onVolumeChanged(p0: Int) {
-//        Log.d("IFVoiceWakeUp", "onVolumeChanged: $p0")
     }
     //tts end
 }

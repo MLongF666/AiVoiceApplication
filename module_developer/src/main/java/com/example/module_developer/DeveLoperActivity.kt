@@ -10,6 +10,7 @@ import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.utils.L
 import com.example.lib_voice.manager.VoiceManager
+import com.example.lib_voice.manager.VoiceManager.startWakeUp
 import com.example.lib_voice.tts.VoiceTTs
 import com.example.module_developer.data.DeveloperListData
 import com.example.module_developer.databinding.ActivityDeveLoperBinding
@@ -114,9 +115,7 @@ class DeveLoperActivity : BaseActivity<ActivityDeveLoperBinding>() {
         mList.add(DeveloperListData(type,text))
     }
 
-    private fun startWakeUp() {
-        VoiceManager.ifStart()
-    }
+
 
     //点击事件
     private fun itemClick(position:Int){
@@ -141,9 +140,9 @@ class DeveLoperActivity : BaseActivity<ActivityDeveLoperBinding>() {
             12->VoiceManager.releaseAsr()
 
 
-            14->startWakeUp()
+            14->VoiceManager.startWakeUp()
 
-            15->VoiceManager.ifStop()
+            15->VoiceManager.stopWakeUp()
 
             20->VoiceManager.ttsStart("你好，欢迎使用语音助手")
             21->VoiceManager.ttsPause()

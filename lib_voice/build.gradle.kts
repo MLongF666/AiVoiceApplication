@@ -37,7 +37,6 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     api(files("libs/bdasr.jar"))
-    api(project(":mscV5PlusDemo"))
 //    api(files("libs\\com.baidu.tts.jar"))
     api(files("libs/bdtts.jar"))
     testImplementation(libs.junit)

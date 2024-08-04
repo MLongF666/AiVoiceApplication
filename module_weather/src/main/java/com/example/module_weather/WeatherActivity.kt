@@ -1,7 +1,12 @@
 package com.example.module_weather
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.DashPathEffect
+import android.text.TextUtils
+import android.view.Menu
+import android.view.MenuItem
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.helper.ARouterHelper
@@ -10,6 +15,7 @@ import com.example.lib_network.HttpManager
 import com.example.lib_network.bean.WeatherDataBean
 import com.example.module_weather.databinding.ActivityWeatherBinding
 import com.example.module_weather.tools.WeatherIconTools
+import com.example.module_weather.ui.CityActivity
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.Legend
 import com.github.mikephil.charting.components.LimitLine
@@ -24,8 +30,9 @@ import retrofit2.Response
 @Route(path = ARouterHelper.PATH_WEATHER)
 class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
     private lateinit var mLineChart : LineChart
+    private val CODE_SELECT_CITY = 1000
     override fun getTitleText(): String {
-        return "天气"
+        return getString(R.string.app_name)
     }
 
     override fun initEvent() {
@@ -47,18 +54,18 @@ class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
     override fun initView() {
         L.d("initView:")
         this.intent.run {
-            var city = getStringExtra("city")
-            if (city==null) {
-                city = "北京"
+            val city = getStringExtra("city")
+            if (city != null) {
                 loadWeather(city)
             }else{
-                loadWeather(city)
+                loadWeather("北京")
             }
         }
     }
 
     private fun loadWeather(city: String) {
-//        initChart()
+        supportActionBar?.title = city
+        initChart()
         L.d("loadWeather:$city")
         HttpManager.queryWeather(city, object : Callback<WeatherDataBean>{
             override fun onResponse(p0: Call<WeatherDataBean>, p1: Response<WeatherDataBean>) {
@@ -115,7 +122,7 @@ class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
                                 val temp = future.temperature.substring(0, 2)
                                 data.add(Entry((index+1).toFloat(),temp.toFloat()))
                             }
-//                            setLineChartData(data)
+                            setLineChartData(data)
                         }
                     }
                 }
@@ -174,9 +181,8 @@ class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
     }
     //初始化图表
     private fun initChart() {
-
         //=============================基本配置=============================
-
+        mLineChart = getBinding().mLineChart
         //后台绘制
         mLineChart.setDrawGridBackground(true)
         //开启描述文本
@@ -216,6 +222,46 @@ class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
 
         //禁止右边的Y轴
         mLineChart.axisRight.isEnabled = false
+    }
+    //显示右上角菜单
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_city, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.menu_city){
+            //跳转到城市选择页面
+            startActivityCity(CityActivity::class.java)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun startActivityCity(clazz: Class<*>) {
+        val intent = Intent(this, clazz)
+        startActivityForResult(intent, CODE_SELECT_CITY)
+    }
+
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        L.d("onActivityResult:$requestCode,$resultCode")
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == CODE_SELECT_CITY) {
+                data?.let {
+                    val city = it.getStringExtra("city")
+                    if (!TextUtils.isEmpty(city)) {
+                        loadWeather(city!!)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        L.d("WeatherActivity onRestart")
     }
 
 }

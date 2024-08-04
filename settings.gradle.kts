@@ -1,3 +1,6 @@
+import groovy.lang.Binding
+import org.gradle.internal.impldep.org.codehaus.plexus.interpolation.reflection.ReflectionValueExtractor.evaluate
+
 pluginManagement {
     repositories {
         google {
@@ -35,5 +38,5 @@ include(":module_app_manager")
 include(":lib_base")
 include(":lib_network")
 include(":lib_voice")
-include(":mscV5PlusDemo")
-include(":testapplication")
+
+

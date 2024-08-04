@@ -73,7 +73,6 @@ dependencies {
     api(libs.refresh.header.material)
     api(libs.refresh.header.classics)
     api(libs.refresh.footer.classics)
-//    testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }

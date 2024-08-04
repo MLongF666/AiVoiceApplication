@@ -20,6 +20,7 @@ abstract class BaseFragment<T : ViewBinding>: androidx.fragment.app.Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         _binding= initViewBinding(inflater)
+        initView()
         return _binding.root
     }
     fun getBinding(): T {
@@ -31,8 +32,10 @@ abstract class BaseFragment<T : ViewBinding>: androidx.fragment.app.Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initView()
+        intData()
     }
+
+    abstract fun intData()
 
     abstract fun initView()
 }

@@ -1,6 +1,5 @@
 package com.example.lib_voice.impl
 
-import com.iflytek.cloud.WakeuperResult
 import org.json.JSONObject
 
 /**
@@ -24,8 +23,7 @@ interface OnAsrResultListener {
     fun asrResult(result: JSONObject)
     //语义识别结果
     fun nluResult(result: JSONObject)
-    //唤醒成功
-    fun weakUpSuccess(result: WakeuperResult)
+
     fun updateUserText(text: String)
     //语音合成结果
 

@@ -31,12 +31,12 @@ object VoiceEngineAnalyze {
             //说明没有识别结果，机器人登场
             nluResultLength <= 0 -> mOnNluResultListener.aiRobot(rawText)
             //单条命中
-            results.length() >= 1 -> analyzeNluSingle(results[0] as JSONObject)
+            results.length() >= 1 -> analyzeNluSingle(results[0] as JSONObject,rawText)
         }
     }
 
     //处理单条结果
-    private fun analyzeNluSingle(result: JSONObject) {
+    private fun analyzeNluSingle(result: JSONObject, rawText: String) {
         val domain = result.optString("domain")
         val intent = result.optString("intent")
         val slots = result.optJSONObject("slots")
@@ -109,12 +109,16 @@ object VoiceEngineAnalyze {
                         val volumeControl = slots.optJSONArray("user_volume_control")
                         volumeControl?.let { control ->
                             val word = (control[0] as JSONObject).optString("word")
-                            if (word == "大点") {
-                                mOnNluResultListener.setVolumeUp()
-                            } else if (word == "小点") {
-                                mOnNluResultListener.setVolumeDown()
-                            } else {
-                                mOnNluResultListener.nluError()
+                            when (word) {
+                                "大点" -> {
+                                    mOnNluResultListener.setVolumeUp()
+                                }
+                                "小点" -> {
+                                    mOnNluResultListener.setVolumeDown()
+                                }
+                                else -> {
+                                    mOnNluResultListener.nluError()
+                                }
                             }
                         }
                     } else {
@@ -236,7 +240,7 @@ object VoiceEngineAnalyze {
                         mOnNluResultListener.nluError()
                     }
                 }
-                else -> mOnNluResultListener.nluError()
+                else -> mOnNluResultListener.aiRobot(rawText)
             }
         }
 

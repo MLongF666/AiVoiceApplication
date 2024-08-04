@@ -7,6 +7,9 @@ package com.example.lib_network.http
  * @version: 1.0
  */
 object HttpKey {
+    const val ROBOT_KEY: String= "free"
+    const val CONSTELLATION_KEY: String="15a42d0dee56a66b982a55d1a42a8e2c"
+
     //笑话
     const val TIANJU_KEY: String="84dbc2b1d3ac790c5ca9d072e8a7bf03"
 

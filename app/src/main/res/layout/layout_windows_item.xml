@@ -39,7 +39,7 @@
         <TextView
             android:layout_margin="10dp"
             android:gravity="center"
-            android:textSize="@dimen/voice_chat_size"
+            android:textSize="16sp"
             android:id="@+id/tvVoiceTips"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

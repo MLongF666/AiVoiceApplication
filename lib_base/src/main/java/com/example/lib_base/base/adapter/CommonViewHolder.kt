@@ -4,6 +4,7 @@ import android.util.SparseArray
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 /**
@@ -33,6 +34,9 @@ open class CommonViewHolder(itemView: View):
         return view!! as T
     }
 
+    fun setText(view: Int, msg: String) {
+        getView<TextView>(view).text = msg
+    }
 
 
 }

@@ -7,6 +7,8 @@ import android.content.Context
 import android.os.Build
 import androidx.core.app.NotificationCompat
 
+
+
 object NotificationHelper {
     private lateinit var mContext: Context
     private lateinit var nm: NotificationManager
@@ -22,8 +24,9 @@ object NotificationHelper {
                 as NotificationManager
         //创建渠道
         setBindVoiceChannel()
+        setBindInitChannel()
     }
-    //设置绑定服务的渠道
+    //设置绑定语音服务的渠道
     private fun setBindVoiceChannel(){
         //创建渠道
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
@@ -56,7 +59,25 @@ object NotificationHelper {
         notificationCompat.setContentText(contentText)
         return notificationCompat.build()
     }
-
+    //设置绑定初始化服务的渠道
+    private fun setBindInitChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            //创建渠道对象
+            val channel =
+                NotificationChannel(
+                    CHANNEL_INIT_ID,
+                    CHANNEL_INIT_NAME,
+                    NotificationManager.IMPORTANCE_HIGH
+                )
+            //呼吸灯
+            channel.enableLights(false)
+            //震动
+            channel.enableVibration(false)
+            //角标
+            channel.setShowBadge(false)
+            nm.createNotificationChannel(channel)
+        }
+    }
     //绑定初始化服务
     fun bindInitService(contentText: String): Notification {
         //创建通知栏对象
@@ -73,6 +94,7 @@ object NotificationHelper {
         notificationCompat.setWhen(System.currentTimeMillis())
         //禁止滑动
         notificationCompat.setAutoCancel(false)
-        return notificationCompat.build()
+        var build = notificationCompat.build()
+        return build
     }
 }

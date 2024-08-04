@@ -18,6 +18,7 @@ import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.base.impl.OnItemClick
 import com.example.lib_base.helper.ARouterHelper
+import com.example.lib_base.helper.`fun`.ConsTellHelper
 import com.example.lib_base.helper.`fun`.ContactHelper
 import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
@@ -38,7 +39,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     )
     private var arrayList = ArrayList<String>()
     private var mList = ArrayList<MainListData>()
-    private var mViewList = ArrayList<View>()
     override fun getTitleText(): String {
         return "AI语音助手"
     }
@@ -52,20 +52,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         arrayMainTitles.forEach {
             arrayList.add(it)
         }
-        queryWater()
-    }
-
-    private fun queryWater() {
-//        HttpManager.queryWeather("平顶山",object : Callback<WeatherDataBean> {
-//            override fun onResponse(p0: Call<WeatherDataBean>, p1: Response<WeatherDataBean>) {
-//
-//            }
-//
-//            override fun onFailure(p0: Call<WeatherDataBean>, p1: Throwable) {
-//
-//            }
-//
-//        })
 
     }
 
@@ -95,9 +81,9 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
     private fun initPageView() {
-        var height = windowManager.defaultDisplay.height
+        val height = windowManager.defaultDisplay.height
 
-        var commonAdapter = CommonAdapter<MainListData>(mList,
+        val commonAdapter = CommonAdapter<MainListData>(mList,
             object : CommonAdapter.OnBindDataListener<MainListData> {
                 override fun onBindViewHolder(
                     model: MainListData,
@@ -105,14 +91,14 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                     type: Int,
                     position: Int
                 ) {
-                    var cardView = viewHolder.getView<CardView>(R.id.bg)
+                    val cardView = viewHolder.getView<CardView>(R.id.bg)
                     cardView.setCardBackgroundColor(model.color)
                     cardView.layoutParams?.let { lp ->
                         lp.height = height / 5 * 3
                     }
-                    var textView = viewHolder.getView<TextView>(R.id.text)
+                    val textView = viewHolder.getView<TextView>(R.id.text)
                     textView.text = model.title
-                    var icon = viewHolder.getView<ImageView>(R.id.icon)
+                    val icon = viewHolder.getView<ImageView>(R.id.icon)
                     icon.setImageResource(model.icon)
                 }
 
