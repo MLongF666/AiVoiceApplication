@@ -41,7 +41,7 @@ class AppManagerActivity : BaseActivity<ActivityAppManagerBinding>() {
             initViewPager()
         }else{
             //等待
-            mHandler.sendEmptyMessageDelayed(waitApp,1000)
+            mHandler.sendEmptyMessageDelayed(waitApp,100)
         }
     }
     override fun initData() {

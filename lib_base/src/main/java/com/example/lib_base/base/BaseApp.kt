@@ -9,7 +9,6 @@ import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.service.InitService
 import com.example.lib_base.utils.CommonUtils
 import com.example.lib_base.utils.L
-import com.example.lib_voice.manager.VoiceManager
 
 open class BaseApp : Application() {
     override fun onCreate() {
@@ -28,13 +27,12 @@ open class BaseApp : Application() {
     private fun initApp() {
         ARouterHelper.initHelper(this)
         NotificationHelper.initHelper(this)
-//        MapManager.initMap(this)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             L.i("start InitService android 8.0以上")
             startForegroundService(Intent(this, InitService::class.java))
         } else {
             startService(Intent(this, InitService::class.java))
         }
+
     }
 }

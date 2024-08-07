@@ -41,10 +41,17 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    sourceSets {
+        getByName("main") {
+            jni {
+                srcDirs("src\\main\\jni", "src\\main\\jni")
+            }
+        }
+    }
 }
 
 dependencies {
-    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+    api(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar","*.aar"))))
     api(libs.mpandroidchart)
     //lottie
     api(libs.lottie)
@@ -61,6 +68,7 @@ dependencies {
     api(libs.androidx.appcompat)
     api(libs.material)
     api(libs.androidx.activity)
+    api(files("libs/BaiduLBS_Android.jar"))
     //运行时注解
     kapt(libs.arouter.compiler)
     api(libs.androidx.core.ktx)

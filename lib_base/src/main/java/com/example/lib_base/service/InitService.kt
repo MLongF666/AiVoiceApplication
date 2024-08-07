@@ -8,6 +8,7 @@ import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.helper.`fun`.CommonSettingHelper
 import com.example.lib_base.helper.`fun`.ConsTellHelper
+import com.example.lib_base.map.MapManager
 import com.example.lib_base.utils.AssetUtils
 import com.example.lib_base.utils.L
 import com.example.lib_base.utils.SpUtil
@@ -39,6 +40,7 @@ class InitService : IntentService(InitService::class.simpleName) {
         CommonSettingHelper.initHelper(this)
         ConsTellHelper.initHelper(this)
         AssetUtils.initUtils(this)
+        MapManager.initMap(application)
         L.i("执行初始化操作")
     }
 

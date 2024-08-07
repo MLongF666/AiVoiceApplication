@@ -35,7 +35,11 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     private val permissions = arrayOf(
     Manifest.permission.RECORD_AUDIO,
     Manifest.permission.CALL_PHONE,
-    Manifest.permission.READ_CONTACTS
+    Manifest.permission.READ_CONTACTS,
+    Manifest.permission.VIBRATE,
+    Manifest.permission.CAMERA,
+    Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.ACCESS_COARSE_LOCATION,
     )
     private var arrayList = ArrayList<String>()
     private var mList = ArrayList<MainListData>()
