@@ -20,10 +20,12 @@ mpandroidchart = "v3.1.0"
 annotation = "1.6.0"
 lifecycleLivedataKtx = "2.8.2"
 lifecycleViewmodelKtx = "2.8.2"
+xdmap = "latest.integration"
 [libraries]
 androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref = "viewpager2" }
 autosize = { module = "me.jessyan:autosize", version.ref = "autosize" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
+
 lottie = { group = "com.airbnb.android", name = "lottie", version = "4.2.2" }
 #viewpager = { group = "com.zhy", name = "magic-viewpager", version = "1.0.1" }
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
@@ -53,6 +55,7 @@ androidx-activity = { group = "androidx.activity", name = "activity", version.re
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-navigation-fragment-ktx = { group = "androidx.navigation", name = "navigation-fragment-ktx", version.ref = "navigationFragmentKtx" }
 androidx-navigation-ui-ktx = { group = "androidx.navigation", name = "navigation-ui-ktx", version.ref = "navigationUiKtx" }
+
 
 [plugins]
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version = "1.9.24" }

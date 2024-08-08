@@ -41,7 +41,6 @@ abstract class BaseActivity<T: ViewBinding > : AppCompatActivity() {
                 it.elevation=0f
                 it.setHomeButtonEnabled(isShowBack())
                 it.setDisplayHomeAsUpEnabled(isShowBack())
-
             }
         }
         initView()
