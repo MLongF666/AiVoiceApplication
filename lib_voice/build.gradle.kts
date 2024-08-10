@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+    api("com.github.chr1123:AndroidWaveView:V1.0.2")
     api(files("libs/bdasr.jar"))
 //    api(files("libs\\com.baidu.tts.jar"))
     api(files("libs/bdtts.jar"))

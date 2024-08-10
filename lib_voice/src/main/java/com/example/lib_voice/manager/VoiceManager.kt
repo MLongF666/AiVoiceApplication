@@ -5,6 +5,7 @@ import android.util.Log
 import com.baidu.speech.EventListener
 import com.baidu.speech.asr.SpeechConstant
 import com.example.lib_voice.asr.VoiceAsr
+import com.example.lib_voice.helper.AudioManagerHelper
 import com.example.lib_voice.impl.OnAsrResultListener
 import com.example.lib_voice.tts.VoiceTTs
 import com.example.lib_voice.wakeup.VoiceWakeUp
@@ -28,6 +29,7 @@ object VoiceManager :EventListener {
         VoiceTTs.initTTS(mContext)
         VoiceAsr.initAsr(mContext,this)
         VoiceWakeUp.initWakeUp(mContext,this)
+
     }
     //tts start
     //播放

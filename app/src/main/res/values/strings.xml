@@ -27,14 +27,24 @@
     <string name="text_voice_query_joke_error">很抱歉，未搜索到笑话</string>
     <!--主页列表图标-->
     <string-array name="MainIconArray">
-        <item>@drawable/img_main_weather</item>
-        <item>@drawable/img_mian_contell</item>
-        <item>@drawable/img_main_joke_icon</item>
-        <item>@drawable/img_main_map_icon</item>
-        <item>@drawable/img_main_app_manager</item>
-        <item>@drawable/img_main_voice_setting</item>
-        <item>@drawable/img_main_system_setting</item>
-        <item>@drawable/img_main_developer</item>
+        <item>@drawable/image_weather</item>
+        <item>@drawable/image_constell</item>
+        <item>@drawable/image_joke</item>
+        <item>@drawable/image_map</item>
+        <item>@drawable/image_app_manager</item>
+        <item>@drawable/image_voice_setting</item>
+        <item>@drawable/image_setting</item>
+        <item>@drawable/image_developer</item>
+    </string-array>
+    <string-array name="MainDescriptionArray">
+        <item>支持查看天气，搜索天气，查看实时天气数据变化</item>
+        <item>可以查看各个时间段的星座运势，支持切换星座</item>
+        <item>观看各式各样的笑话，支持刷新笑话，查看更多笑话</item>
+        <item>查看实时定位，导航，搜索周边的景点，公交，地铁等</item>
+        <item>可以对应手机上安装的应用进行管理</item>
+        <item>设置语音助手相关参数，如音量大小，语速，播放器模式等</item>
+        <item>语音助手设置，欢迎词，笑话后台播放设置等</item>
+        <item>设置开发相关参数，查看开发者信息，版本信息，联系方式等</item>
     </string-array>
 
 

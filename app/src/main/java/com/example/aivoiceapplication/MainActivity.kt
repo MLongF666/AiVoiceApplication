@@ -2,14 +2,27 @@ package com.example.aivoiceapplication
 
 
 import android.Manifest
+import android.annotation.SuppressLint
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.media.AudioFormat
+import android.media.AudioManager
+import android.media.AudioRecord
+import android.media.MediaRecorder
+import android.os.Handler
+import android.os.IBinder
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
+import androidx.databinding.DataBindingUtil.getBinding
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
+import com.chrischen.waveview.WaveView
 import com.example.aivoiceapplication.data.MainListData
 import com.example.aivoiceapplication.databinding.ActivityMainBinding
 import com.example.aivoiceapplication.service.VoiceService
@@ -18,38 +31,50 @@ import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.lib_base.base.impl.OnItemClick
 import com.example.lib_base.helper.ARouterHelper
-import com.example.lib_base.helper.`fun`.ConsTellHelper
 import com.example.lib_base.helper.`fun`.ContactHelper
 import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
-import com.example.lib_network.HttpManager
-import com.example.lib_network.bean.WeatherDataBean
-import okhttp3.ResponseBody
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import com.example.lib_voice.helper.AudioManagerHelper
+import com.example.lib_voice.helper.VolumeChangeObserver
+import kotlin.math.abs
 
 
-class MainActivity : BaseActivity<ActivityMainBinding>() {
-//    private val WINDOW_PERMISSION=1000
+class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.VolumeChangeListener {
     private val permissions = arrayOf(
-    Manifest.permission.RECORD_AUDIO,
-    Manifest.permission.CALL_PHONE,
-    Manifest.permission.READ_CONTACTS,
-    Manifest.permission.VIBRATE,
-    Manifest.permission.CAMERA,
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.RECORD_AUDIO,
+        Manifest.permission.CALL_PHONE,
+        Manifest.permission.READ_CONTACTS,
+        Manifest.permission.VIBRATE,
+        Manifest.permission.CAMERA,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION,
     )
+
+    private val mUiHandler = Handler()
+    private lateinit var mOnVoiceListener: VoiceService.OnVoiceListener
     private var arrayList = ArrayList<String>()
     private var mList = ArrayList<MainListData>()
+    private lateinit var mVolumeChangeObserver: VolumeChangeObserver
     override fun getTitleText(): String {
         return "AI语音助手"
     }
 
     override fun initEvent() {
-    }
+        getBinding().buttonVoice.setOnClickListener {
+            mOnVoiceListener.wakeUpFix()
+        }
+        mVolumeChangeObserver.volumeChangeListener = this
+        AudioManagerHelper.setOnMyAudioFocusChangeListener(object :AudioManagerHelper.OnMyAudioFocusChangeListener{
+            override fun setVolume(volume: Int){
+                L.d("getVolume MainActivity: $volume")
+            }
 
+            override fun getStreamType(): Int {
+                return AudioManager.STREAM_VOICE_CALL
+            }
+
+        })
+    }
     override fun initData() {
         val arrayMainTitles = resources.getStringArray(com.example.lib_base.R.array.MainTitleArray)
 
@@ -67,21 +92,32 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
         return false
     }
 
+    override fun onResume() {
+        super.onResume()
+        mVolumeChangeObserver.registerReceiver()
+    }
+    override fun onPause() {
+        super.onPause()
+        mVolumeChangeObserver.unregisterReceiver()
+    }
     override fun initView() {
-
+        mVolumeChangeObserver = VolumeChangeObserver(this)
         //动态权限
-        if (checkPermission(permissions)){
+        if (checkPermission(permissions)) {
             linkService()
-        }else{
-            requestPermission(permissions
+        } else {
+            requestPermission(
+                permissions
             ) { linkService() }
         }
         //窗口权限
-        if (!checkWindowPermission()){
+        if (!checkWindowPermission()) {
             requestWindowPermission(packageName)
         }
         initPageData()
         initPageView()
+        val intent = Intent(this, VoiceService::class.java)
+        bindService(intent, MyConnection(), Context.BIND_AUTO_CREATE)
     }
 
     private fun initPageView() {
@@ -95,56 +131,72 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
                     type: Int,
                     position: Int
                 ) {
-                    val cardView = viewHolder.getView<CardView>(R.id.bg)
+                    val layout = viewHolder.getView<LinearLayout>(R.id.bg)
+                    val cardView = viewHolder.getView<CardView>(R.id.card)
                     cardView.setCardBackgroundColor(model.color)
-                    cardView.layoutParams?.let { lp ->
+                    layout.layoutParams?.let { lp ->
                         lp.height = height / 5 * 3
                     }
                     val textView = viewHolder.getView<TextView>(R.id.text)
                     textView.text = model.title
                     val icon = viewHolder.getView<ImageView>(R.id.icon)
                     icon.setImageResource(model.icon)
+                    val description = viewHolder.getView<TextView>(R.id.description)
+                    description.text = model.description
+                    //设置text一行展示 省略号
+                    if (model.description.length > 10) {
+                        description.ellipsize = android.text.TextUtils.TruncateAt.END
+                        description.maxLines = 1
+                    }
                 }
 
                 override fun getLayoutId(type: Int): Int {
                     return R.layout.item_main_list
                 }
             })
-        getBinding().viewPager.adapter= commonAdapter
-        getBinding().viewPager.offscreenPageLimit=mList.size
-        var transformer = CompositePageTransformer()
+        getBinding().viewPager.adapter = commonAdapter
+        getBinding().viewPager.offscreenPageLimit = mList.size
+        val transformer = CompositePageTransformer()
         transformer.addTransformer(ScaleInTransformer())
-        transformer.addTransformer(MarginPageTransformer(20))
+        transformer.addTransformer(MarginPageTransformer(70))
         getBinding().viewPager.setPageTransformer(transformer)
-        commonAdapter.setOnItemClick(object :OnItemClick<MainListData>{
+        commonAdapter.setOnItemClick(object : OnItemClick<MainListData> {
             override fun onItemClick(position: Int, view: View, t: MainListData) {
-                Toast.makeText(this@MainActivity,t.title, Toast.LENGTH_SHORT).show()
-                when(t.title){
-                    "应用管理"->{
+                Toast.makeText(this@MainActivity, t.title, Toast.LENGTH_SHORT).show()
+                when (t.title) {
+                    "应用管理" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_APP_MANAGER)
                     }
-                    "开发者模式"-> {
+
+                    "开发者模式" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_DEVELOPER)
                     }
-                    "天气"->{
+
+                    "天气" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_WEATHER)
                     }
-                    "星座"->{
+
+                    "星座" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_CONSTELLATION)
                     }
-                    "笑话"->{
+
+                    "笑话" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_JOKE)
                     }
-                    "地图"->{
+
+                    "地图" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_MAP)
                     }
-                    "语音设置"->{
+
+                    "语音设置" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_VOICE_SETTING)
                     }
-                    "系统设置"->{
+
+                    "系统设置" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_SETTING)
                     }
-                    else->{
+
+                    else -> {
                         return
                     }
                 }
@@ -155,25 +207,96 @@ class MainActivity : BaseActivity<ActivityMainBinding>() {
     }
 
 
+    @SuppressLint("Recycle")
     private fun initPageData() {
 
         //获取页面数据
-        var titleArray = resources.getStringArray(com.example.lib_base.R.array.MainTitleArray)
-        var colorsArray = resources.getIntArray(R.array.MainColorArray)
-        var iconsArray = resources.obtainTypedArray(R.array.MainIconArray)
+        val titleArray = resources.getStringArray(com.example.lib_base.R.array.MainTitleArray)
+        val colorsArray = resources.getIntArray(R.array.MainColorArray)
+        val iconsArray = resources.obtainTypedArray(R.array.MainIconArray)
+        val descriptionArray = resources.getStringArray(R.array.MainDescriptionArray)
 
-        for ((index, value ) in titleArray.withIndex()){
-            mList.add(MainListData(value,colorsArray[index],
-                iconsArray.getResourceId(index,0)))
+        for ((index, value) in titleArray.withIndex()) {
+            mList.add(
+                MainListData(
+                    value, colorsArray[index],
+                    iconsArray.getResourceId(index, 0),
+                    descriptionArray[index]
+                )
+            )
         }
-
 
 
     }
 
     private fun linkService() {
         ContactHelper.init(this)
+        ReadAudioThread().start()
         startService(Intent(this, VoiceService::class.java))
     }
 
+    internal inner class MyConnection : ServiceConnection {
+        override fun onServiceDisconnected(p0: ComponentName?) {
+        }
+
+
+        override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
+            mOnVoiceListener = p1 as VoiceService.OnVoiceListener//对象的强制转换
+        }
+
+    }
+    override fun onVolumeChanged(volume: Int) {
+        L.d("onVolumeChanged MainActivity: $volume")
+    }
+    inner class ReadAudioThread(): Thread() {
+        var amplitude = 0
+        private val audioSource = MediaRecorder.AudioSource.MIC
+        private val sampleRate = 44100
+        private val channelConfig = AudioFormat.CHANNEL_IN_MONO
+        private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+        private var bufferSize: Int = 1024
+        private var audioRecord: AudioRecord? = null
+        //        audioRecord!!.startRecording()
+//        audioRecord!!.read(audioData, 0, bufferSize)
+        @SuppressLint("MissingPermission")
+        override fun run() {
+            try {
+                bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+                audioRecord = AudioRecord(audioSource, sampleRate, channelConfig, audioFormat, bufferSize)
+                audioRecord!!.startRecording() //开录
+                while (true) {
+                    sleep(50)
+                    val audioData = ShortArray(bufferSize)
+                    val readSize = audioRecord!!.read(audioData, 0, bufferSize)
+                    var sum: Long = 0
+                    for (i in 0 until readSize) {
+                        sum += abs(audioData[i].toInt()).toLong()
+                    }
+                    if (readSize > 0) {
+                        amplitude = (sum / readSize).toInt()
+                        L.d("amplitude: $amplitude")
+                        val runnable = Runnable(object : Runnable, () -> Unit {
+                            override fun run() {
+                                getBinding().waveView.putValue(amplitude)
+                                getBinding().waveView.invalidate()
+                                L.d("form ReadAudioThread: amplitude: $amplitude")
+//                                Toast.makeText(this@MainActivity, "amplitude: $amplitude", Toast.LENGTH_SHORT).show()
+                            }
+                            override fun invoke() {
+                                run()
+                            }
+                        })
+                        mUiHandler.post(runnable)
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+            //向主线程通信
+
+
+            //主线程处理音频数据
+
+        }
+    }
 }

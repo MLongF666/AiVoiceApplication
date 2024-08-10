@@ -3,7 +3,6 @@ package com.example.lib_base.map
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import androidx.core.view.isNotEmpty
 import com.amap.api.location.AMapLocation
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
@@ -11,6 +10,12 @@ import com.amap.api.location.AMapLocationListener
 import com.amap.api.maps.AMap
 import com.amap.api.maps.MapView
 import com.amap.api.maps.MapsInitializer
+import com.amap.api.maps.model.LatLng
+import com.amap.api.services.core.LatLonPoint
+import com.amap.api.services.geocoder.GeocodeResult
+import com.amap.api.services.geocoder.GeocodeSearch
+import com.amap.api.services.geocoder.RegeocodeQuery
+import com.amap.api.services.geocoder.RegeocodeResult
 import com.amap.apis.utils.core.api.AMapUtilCoreApi
 import com.example.lib_base.map.imp.GDMapListener
 import com.example.lib_base.utils.L
@@ -23,8 +28,8 @@ import com.example.lib_base.utils.L
  * @version: 1.0
  */
 @SuppressLint("StaticFieldLeak")
-object GDMapManager :AMapLocationListener{
-
+object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener {
+    private lateinit var mGeocodeSearch: GeocodeSearch
     //声明AMapLocationClient类对象
     private lateinit var mListener: GDMapListener
     private lateinit var mLocationClient: AMapLocationClient
@@ -42,9 +47,9 @@ object GDMapManager :AMapLocationListener{
          */
         option.setLocationPurpose(AMapLocationClientOption.AMapLocationPurpose.SignIn)
          //高精度
-        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy)
+//        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Hight_Accuracy)
          //低功耗 只使用网络定位
-//        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
+        option.setLocationMode(AMapLocationClientOption.AMapLocationMode.Battery_Saving);
         option.setInterval(2000);
         //设置是否返回地址信息（默认返回地址信息）
         option.setNeedAddress(true);
@@ -64,6 +69,8 @@ object GDMapManager :AMapLocationListener{
         //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
         setSwitchLocation(true)
         setMyLocationEnabled(true)
+        mGeocodeSearch = GeocodeSearch(mContext)
+        mGeocodeSearch.setOnGeocodeSearchListener(this)
 
 
     }
@@ -116,6 +123,19 @@ object GDMapManager :AMapLocationListener{
     }
     override fun onLocationChanged(p0: AMapLocation?) {
         L.i("onLocationChanged ${p0?.latitude}")
+        p0?.let {
+            val latLonPoint = LatLonPoint(p0.latitude, p0.longitude)
+            val query = RegeocodeQuery(latLonPoint, 200f, GeocodeSearch.AMAP)
+            mGeocodeSearch.getFromLocationAsyn(query);
+        }
         mListener.onLocationChanged(p0)
+    }
+
+    override fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int) {
+        mListener.onRegeocodeSearched(p0,p1)
+    }
+
+    override fun onGeocodeSearched(p0: GeocodeResult?, p1: Int) {
+        mListener.onGeocodeSearched(p0,p1)
     }
 }

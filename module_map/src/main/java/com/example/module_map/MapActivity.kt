@@ -8,17 +8,18 @@ import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
-import android.telephony.mbms.DownloadRequest
-import android.webkit.DownloadListener
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.amap.api.location.AMapLocation
 import com.amap.api.maps.AMap
 import com.amap.api.maps.MapView
+import com.amap.api.services.geocoder.GeocodeResult
+import com.amap.api.services.geocoder.RegeocodeResult
 import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.map.GDMapManager
 import com.example.lib_base.map.imp.GDMapListener
 import com.example.lib_base.utils.L
+import com.example.lib_voice.manager.VoiceManager
 import com.example.module_map.databinding.ActivityMapBinding
 import com.yanzhenjie.permission.Action
 
@@ -71,36 +72,49 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
         if(checkPermission(permissions)){
             //Option
             L.i("权限申请成功")
-            GDMapManager.setGDMapListener(object :GDMapListener{
-                override fun onLocationChanged(var1: AMapLocation?) {
-                    L.i("onLocationChanged: MapActivity ${var1.toString()}")
-                    var1?.let {
-                        L.i("定位成功${it.toString()}")
-                        when (it.errorCode) {
-                            0->{
-                                L.i(
-                                    "定位成功${it.locationType},${it.latitude}," +
-                                            "${it.longitude},${it.city},${it.address}"
-                                )
-                            }
-                        }
-                    }
-                }
-            })
+            setLocation()
         }else{
             requestPermission(permissions,Action<List<String>>{
-                GDMapManager.setGDMapListener(object: GDMapListener {
-                    override fun onLocationChanged(mAmLocation: AMapLocation?) {
-                        mAmLocation?.let {
-                            L.i("定位成功:${mAmLocation.locationType},${mAmLocation.latitude}," +
-                                    "${mAmLocation.longitude},${mAmLocation.accuracy},${mAmLocation.address}")
-                        }
-                    }
-
-                })
+                setLocation()
             })
         }
     }
+
+    private fun setLocation() {
+        GDMapManager.setGDMapListener(object : GDMapListener {
+            override fun onLocationChanged(var1: AMapLocation?) {
+                L.i("onLocationChanged: MapActivity ${var1.toString()}")
+                var1?.let {
+                    when (it.errorCode) {
+                        0 -> {
+                            L.i(
+                                "定位成功${it.locationType},${it.latitude}," +
+                                        "${it.longitude},${it.city},${it.address}"
+                            )
+                        }
+
+                        else -> {
+                            L.i("定位:${it.toString()}")
+                        }
+                    }
+                }
+            }
+
+            override fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int) {
+                val address = p0?.regeocodeAddress
+                L.i(
+                    "onRegeocodeSearched: MapActivity ${address?.formatAddress},${address?.country}" +
+                            "${address?.province},${address?.city},${address?.district}"
+                )
+//                p0?.regeocodeAddress?.formatAddress?.let { VoiceManager.ttsStart(it) }
+            }
+
+            override fun onGeocodeSearched(p0: GeocodeResult?, p1: Int) {
+
+            }
+        })
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         L.d("onActivityResult: MapActivity $requestCode,$resultCode")
@@ -128,7 +142,8 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
     }
 
     override fun initView() {
-
+        //获取应用包名
+        L.i("包名:${application.packageName}")
     }
     //判断是否打开了定位
     private fun isOpenLocation(): Boolean {

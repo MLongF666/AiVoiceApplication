@@ -2,6 +2,8 @@ package com.example.aivoiceapplication.service
 
 import android.app.Service
 import android.content.Intent
+import android.media.AudioManager
+import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.view.View
@@ -33,11 +35,11 @@ import com.example.lib_voice.impl.OnNluResultListener
 import com.example.lib_voice.manager.VoiceManager
 import com.example.lib_voice.tts.VoiceTTs
 import com.example.lib_voice.words.WordsTools
-
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+
 
 /**
  * @description: TODO 语音服务
@@ -46,14 +48,13 @@ import retrofit2.Response
  * @version: 1.0
  */
 class VoiceService : Service(), OnNluResultListener {
-
+    private lateinit var mAudioManager: AudioManager
     private lateinit var  textViewTips:TextView
     private lateinit var  mLottieAnimationView:LottieAnimationView
     private var chatListAdapter: ChatListAdapter? = null
     private val mHandler = Handler()
-    private val TAG = VoiceService::class.java.simpleName
-    override fun onBind(intent: Intent?): IBinder? {
-        return null
+    override fun onBind(intent: Intent?): IBinder {
+        return LocalBinder()
     }
     //START_STICKY 保证服务一直运行，直到被系统杀死
     //START_NOT_STICKY 默认值，服务被系统杀死，不会重启
@@ -83,7 +84,7 @@ class VoiceService : Service(), OnNluResultListener {
         mFullWindowsView.findViewById<ImageView>(R.id.ivCloseWindow).setOnClickListener {
             hideWindow()
         }
-        var layoutManager = LinearLayoutManager(this)
+        val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd=true
         mChatListView.layoutManager= layoutManager
 
@@ -135,7 +136,7 @@ class VoiceService : Service(), OnNluResultListener {
             }
         })
     }
-    private fun wakeUpFix() {
+    fun wakeUpFix() {
         showWindow()
         updateTips(getString(R.string.text_voice_wakeup_tips))
         //应答
@@ -221,6 +222,7 @@ class VoiceService : Service(), OnNluResultListener {
             WindowsHelper.hideView(mFullWindowsView)
             mLottieAnimationView.pauseAnimation()
             SoundPoolHelper.play(R.raw.record_over)
+            VoiceManager.stopAsr()
         },500)
     }
 
@@ -420,5 +422,14 @@ class VoiceService : Service(), OnNluResultListener {
     private fun jokeError(){
         addAiText(getString(R.string.text_voice_query_joke_error))
         hideWindow()
+    }
+    interface OnVoiceListener{
+        fun wakeUpFix()
+    }
+    internal inner class LocalBinder : Binder(),OnVoiceListener {
+        override fun wakeUpFix() {
+            this@VoiceService.wakeUpFix()
+        }
+
     }
 }

@@ -1,6 +1,8 @@
 package com.example.lib_base.map.imp
 
 import com.amap.api.location.AMapLocation
+import com.amap.api.services.geocoder.GeocodeResult
+import com.amap.api.services.geocoder.RegeocodeResult
 
 /**
  * @description: TODO
@@ -10,4 +12,6 @@ import com.amap.api.location.AMapLocation
  */
 interface GDMapListener {
     fun onLocationChanged(var1: AMapLocation?)
+    fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int)
+    fun onGeocodeSearched(p0: GeocodeResult?, p1: Int)
 }

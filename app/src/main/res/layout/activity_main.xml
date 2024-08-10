@@ -3,20 +3,42 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="@color/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipChildren="false"
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".MainActivity">
-
     <androidx.viewpager2.widget.ViewPager2
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="50dp"
-        android:layout_marginEnd="50dp"
+        android:layout_height="0dp"
+        android:layout_weight="4"
         android:baselineAligned="false"
         android:clipChildren="false" />
+    <LinearLayout
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+        <com.chrischen.waveview.WaveView
+            app:wvType="centerLine"
+            app:wvLineColor="@color/purple_200"
+            app:wvLineSpace="10dp"
+            app:wvCenterLineColor="@color/background"
+            app:wvLineWidth="1dp"
+            android:id="@+id/wave_view"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"/>
+    <ImageView
+        android:src="@drawable/airobot"
+        android:id="@+id/button_voice"
+        android:layout_width="70dp"
+        android:layout_height="70dp"/>
+    </LinearLayout>
 
 </LinearLayout>

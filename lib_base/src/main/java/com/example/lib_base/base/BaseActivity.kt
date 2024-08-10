@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.example.lib_base.R
@@ -28,6 +29,9 @@ abstract class BaseActivity<T: ViewBinding > : AppCompatActivity() {
     private lateinit var binding: T
     fun getBinding(): T {
         return binding
+    }
+    fun String.toast(duration: Int = Toast.LENGTH_SHORT) {
+        Toast.makeText(this@BaseActivity, this, duration).show()
     }
     abstract fun getTitleText(): String;
     override fun onCreate(savedInstanceState: Bundle?) {
