@@ -122,7 +122,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
 
     private fun initPageView() {
         val height = windowManager.defaultDisplay.height
-
         val commonAdapter = CommonAdapter<MainListData>(mList,
             object : CommonAdapter.OnBindDataListener<MainListData> {
                 override fun onBindViewHolder(
@@ -149,7 +148,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
                         description.maxLines = 1
                     }
                 }
-
                 override fun getLayoutId(type: Int): Int {
                     return R.layout.item_main_list
                 }
@@ -195,21 +193,19 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
                     "系统设置" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_SETTING)
                     }
-
                     else -> {
                         return
                     }
                 }
             }
         })
-
-
     }
-
-
+    override fun onStop() {
+        super.onStop()
+        ReadAudioThread().interrupt()//停止线程
+    }
     @SuppressLint("Recycle")
     private fun initPageData() {
-
         //获取页面数据
         val titleArray = resources.getStringArray(com.example.lib_base.R.array.MainTitleArray)
         val colorsArray = resources.getIntArray(R.array.MainColorArray)
@@ -225,29 +221,24 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
                 )
             )
         }
-
-
     }
-
     private fun linkService() {
         ContactHelper.init(this)
         ReadAudioThread().start()
+
         startService(Intent(this, VoiceService::class.java))
     }
-
     internal inner class MyConnection : ServiceConnection {
         override fun onServiceDisconnected(p0: ComponentName?) {
         }
-
-
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
             mOnVoiceListener = p1 as VoiceService.OnVoiceListener//对象的强制转换
         }
-
     }
     override fun onVolumeChanged(volume: Int) {
         L.d("onVolumeChanged MainActivity: $volume")
     }
+    //读取音频线程
     inner class ReadAudioThread(): Thread() {
         var amplitude = 0
         private val audioSource = MediaRecorder.AudioSource.MIC
@@ -256,8 +247,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
         private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
         private var bufferSize: Int = 1024
         private var audioRecord: AudioRecord? = null
-        //        audioRecord!!.startRecording()
-//        audioRecord!!.read(audioData, 0, bufferSize)
         @SuppressLint("MissingPermission")
         override fun run() {
             try {
@@ -275,27 +264,23 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
                     if (readSize > 0) {
                         amplitude = (sum / readSize).toInt()
                         L.d("amplitude: $amplitude")
+                        //向主线程发送消息
                         val runnable = Runnable(object : Runnable, () -> Unit {
                             override fun run() {
                                 getBinding().waveView.putValue(amplitude)
                                 getBinding().waveView.invalidate()
                                 L.d("form ReadAudioThread: amplitude: $amplitude")
-//                                Toast.makeText(this@MainActivity, "amplitude: $amplitude", Toast.LENGTH_SHORT).show()
                             }
                             override fun invoke() {
                                 run()
                             }
                         })
-                        mUiHandler.post(runnable)
+                        mUiHandler.post(runnable)//发送消息
                     }
                 }
             }catch (e: Exception){
                 e.printStackTrace()
             }
-            //向主线程通信
-
-
-            //主线程处理音频数据
 
         }
     }

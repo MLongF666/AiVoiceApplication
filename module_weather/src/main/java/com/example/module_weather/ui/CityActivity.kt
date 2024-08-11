@@ -106,7 +106,13 @@ class CityActivity : BaseActivity<ActivityCityBinding>() {
                 if (!mListTitle.contains(province)){
                     addTitle(province)
                 }
-                addContent(it.city+it.district,it.city,it.province)
+                if (it.city==it.district){
+                    addContent(it.city,it.city,it.province)
+                }else{
+                    addContent(it.city+it.district,it.city,it.province)
+                }
+
+
             }
         }
         getBinding().citySelectView.setCityList(mListTitle)

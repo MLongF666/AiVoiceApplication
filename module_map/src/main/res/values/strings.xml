@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">map</string>
+
+
+    <string-array name="Markers">
+        <item>@drawable/poi_marker_1</item>
+        <item>@drawable/poi_marker_2</item>
+        <item>@drawable/poi_marker_3</item>
+        <item>@drawable/poi_marker_4</item>
+        <item>@drawable/poi_marker_5</item>
+        <item>@drawable/poi_marker_6</item>
+        <item>@drawable/poi_marker_7</item>
+        <item>@drawable/poi_marker_8</item>
+        <item>@drawable/poi_marker_9</item>
+        <item>@drawable/poi_marker_10</item>
+    </string-array>
 </resources>

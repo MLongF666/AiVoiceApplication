@@ -11,6 +11,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.utils.L
+import com.example.lib_base.utils.SpUtil
 import com.example.lib_network.HttpManager
 import com.example.lib_network.bean.WeatherDataBean
 import com.example.module_weather.databinding.ActivityWeatherBinding
@@ -58,12 +59,17 @@ class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
             if (city != null) {
                 loadWeather(city)
             }else{
-                loadWeather("北京")
+                if (SpUtil.get("city", "").toString().isEmpty()){
+                    loadWeather("北京")
+                }else{
+                    loadWeather(SpUtil.get("city", "").toString())
+                }
             }
         }
     }
 
     private fun loadWeather(city: String) {
+        SpUtil.put("city", city)
         supportActionBar?.title = city
         initChart()
         L.d("loadWeather:$city")

@@ -2,24 +2,32 @@ package com.example.module_map
 
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Application
 import android.content.Intent
+import android.content.res.TypedArray
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
+import android.widget.Toast
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.amap.api.location.AMapLocation
 import com.amap.api.maps.AMap
 import com.amap.api.maps.MapView
+import com.amap.api.maps.model.BitmapDescriptorFactory
+import com.amap.api.maps.model.LatLng
+import com.amap.api.maps.model.Marker
+import com.amap.api.services.core.LatLonPoint
+import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.geocoder.GeocodeResult
 import com.amap.api.services.geocoder.RegeocodeResult
+import com.amap.api.services.poisearch.PoiResultV2
 import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.map.GDMapManager
 import com.example.lib_base.map.imp.GDMapListener
 import com.example.lib_base.utils.L
-import com.example.lib_voice.manager.VoiceManager
 import com.example.module_map.databinding.ActivityMapBinding
 import com.yanzhenjie.permission.Action
 
@@ -29,6 +37,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
     private val POSITION_REQUEST_CODE: Int = 100
     private var mBundle:Bundle?=null
     private lateinit var mMapView: MapView
+    private var markers: TypedArray? =null
     private val permissions = arrayOf(
         Manifest.permission.VIBRATE,
         Manifest.permission.CAMERA,
@@ -40,11 +49,9 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
     }
 
     override fun initEvent() {
-
     }
 
     override fun initData() {
-
     }
 
     override fun initViewBinding(): ActivityMapBinding {
@@ -64,10 +71,11 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
             initMap(mMapView, mBundle,application)
         }
     }
+    @SuppressLint("Recycle")
     private fun initMap(mapView: MapView, mBundle: Bundle?, application: Application) {
         GDMapManager.bindMapView(mapView, mBundle,application)
         GDMapManager.setTerrainEnable(true)
-        GDMapManager.setMapType(AMap.MAP_TYPE_SATELLITE)
+        GDMapManager.setMapType(AMap.MAP_TYPE_NORMAL)
         //判断
         if(checkPermission(permissions)){
             //Option
@@ -78,8 +86,9 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
                 setLocation()
             })
         }
+        markers = resources.obtainTypedArray(R.array.Markers)
     }
-
+    private var latLonPoint=LatLonPoint(0.0,0.0)
     private fun setLocation() {
         GDMapManager.setGDMapListener(object : GDMapListener {
             override fun onLocationChanged(var1: AMapLocation?) {
@@ -91,30 +100,59 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
                                 "定位成功${it.locationType},${it.latitude}," +
                                         "${it.longitude},${it.city},${it.address}"
                             )
+                            latLonPoint = LatLonPoint(it.latitude, it.longitude)
+                            GDMapManager.poiSearchAround("生活服务","",latLonPoint,1,10,10000,this@MapActivity)
+                            GDMapManager.setCameraPosition(LatLng(it.latitude, it.longitude), 18f)
+                            GDMapManager.addMarkerDefault(LatLng(it.latitude, it.longitude), "当前位置", "")
                         }
-
                         else -> {
                             L.i("定位:${it.toString()}")
                         }
                     }
                 }
             }
-
             override fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int) {
-                val address = p0?.regeocodeAddress
-                L.i(
-                    "onRegeocodeSearched: MapActivity ${address?.formatAddress},${address?.country}" +
-                            "${address?.province},${address?.city},${address?.district}"
-                )
-//                p0?.regeocodeAddress?.formatAddress?.let { VoiceManager.ttsStart(it) }
+                p0?.regeocodeAddress?.let {
+                    L.i(
+                        "onRegeocodeSearched: MapActivity ${it.formatAddress},${it.country}" +
+                                "${it.province},${it.city},${it.district}"
+                    )
+                }
+
+            }
+            override fun onGeocodeSearched(p0: GeocodeResult?, p1: Int) {
+                L.i("onGeocodeSearched: ${p0?.geocodeQuery},${p1}")
             }
 
-            override fun onGeocodeSearched(p0: GeocodeResult?, p1: Int) {
+            override fun onPoiSearched(p0: PoiResultV2?, p1: Int) {
+                if (p1==1000){
+                    L.i("onPoiSearched: ${p0?.pois?.size}")
+                    //将 POI 显示在地图上
+                    p0?.let {
+                        //将查询到的 POI 以绘制点的方式显示在地图上
+                        it.pois.forEachIndexed {index, poiItem ->
+                            val markerId = markers?.getResourceId(index, 0)
+                            GDMapManager.addMarker(
+                                LatLng(poiItem.latLonPoint.latitude, poiItem.latLonPoint.longitude),
+                                poiItem.title, poiItem.snippet,this@MapActivity,markerId!!)
+                        }
+                    }
+                }
+            }
+            override fun onPoiItemSearched(p0: PoiItemV2?, p1: Int) {
+                L.i("onPoiItemSearched: ${p0?.toString()},${p1}")
+            }
+            override fun onMarkerClick(it: Marker?) {
+                L.i("onMarkerClick: ${it?.title}")
+                Toast.makeText(this@MapActivity, it?.title, Toast.LENGTH_SHORT).show()
+                it?.let {
 
+                }
             }
         })
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         L.d("onActivityResult: MapActivity $requestCode,$resultCode")
@@ -122,7 +160,6 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
             if (requestCode==POSITION_REQUEST_CODE){
                 initMap(getBinding().map, mBundle,application)
                 GDMapManager.setSwitchLocation(true)
-                GDMapManager.setMyLocationEnabled(true)
             }
         }
     }
@@ -137,7 +174,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
                 intent.addCategory(Intent.CATEGORY_DEFAULT)
                 startActivityForResult(intent, POSITION_REQUEST_CODE)
             }.setNegativeButton("取消"
-            ) { dialog, which -> finish() }
+            ) { _, _ -> finish() }
             .show()
     }
 
@@ -150,23 +187,18 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
         val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
     }
-
-
     override fun onResume() {
         super.onResume()
-//        BDMapManager.onResume()
-        mMapView.onResume()
+        GDMapManager.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-//        BDMapManager.onPause()
-        mMapView.onPause()
+        GDMapManager.onPause()
     }
     override fun onDestroy() {
         super.onDestroy()
-//        BDMapManager.onDestroy()
-        mMapView.onDestroy()
+    GDMapManager.onDestroy()
     }
 
 }
