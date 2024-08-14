@@ -25,6 +25,10 @@
             android:name="org.apache.http.legacy"
             android:required="false"/>
         <activity
+            android:name="com.amap.api.navi.AmapRouteActivity"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:configChanges="orientation|keyboardHidden|screenSize|navigation" />
+        <activity
             android:launchMode="singleTop"
             android:name=".MainActivity"
             android:exported="true"

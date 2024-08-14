@@ -10,6 +10,7 @@ import android.content.res.TypedArray
 import android.location.LocationManager
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import android.widget.Toast
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.amap.api.location.AMapLocation
@@ -96,6 +97,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
         markers = resources.obtainTypedArray(R.array.Markers)
     }
     private var mPositonLatLonPoint=LatLonPoint(0.0,0.0)
+    private var mMarker:Marker?=null
     private fun setLocation() {
         GDMapManager.setGDMapListener(object : GDMapListener {
             override fun onLocationChanged(var1: AMapLocation?) {
@@ -110,15 +112,15 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
                             mPositonLatLonPoint = LatLonPoint(it.latitude, it.longitude)
                             mStartLatLonPoint = mPositonLatLonPoint
                             //定位成功之后开始POI搜索
-//                            GDMapManager.poiSearchAround(
-//                                "生活服务",
-//                                "",
-//                                latLonPoint,
-//                                1,
-//                                10,
-//                                10000,
-//                                this@MapActivity
-//                            )
+                            GDMapManager.poiSearchAround(
+                                "生活服务",
+                                "",
+                                mPositonLatLonPoint,
+                                1,
+                                10,
+                                10000,
+                                this@MapActivity
+                            )
                             GDMapManager.setCameraPosition(LatLng(it.latitude, it.longitude), 15f)
                             GDMapManager.addMarkerDefault(
                                 LatLng(it.latitude, it.longitude),
@@ -174,15 +176,17 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
                 L.i("onMarkerClick: ${it?.title}")
                 Toast.makeText(this@MapActivity, it?.title, Toast.LENGTH_SHORT).show()
                 it?.let {
+                    mMarker = it
                     val position = it.position
                     mEndLatLonPoint = LatLonPoint(position.latitude, position.longitude)
-                    if(mStartLatLonPoint.latitude!=0.0&&mEndLatLonPoint.latitude!=0.0){
-                        GDMapManager.startWalkRouteSearch(
-                            mStartLatLonPoint,
-                            mEndLatLonPoint,
-                            RouteSearch.WalkDefault
-                        )
-                    }
+//                    if(mStartLatLonPoint.latitude!=0.0&&mEndLatLonPoint.latitude!=0.0){
+////                        GDMapManager.startWalkRouteSearch(
+////                            mStartLatLonPoint,
+////                            mEndLatLonPoint,
+////                            RouteSearch.WalkDefault
+////                        )
+////                        GDMapManager.startWalkNavi(mStartLatLonPoint, mEndLatLonPoint,"我的位置",it.title)
+//                    }
                     L.i("onMarkerClick: ${mStartLatLonPoint.toString()},${mEndLatLonPoint.toString()}")
                 }
             }
@@ -200,6 +204,42 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
 
             override fun onRideRouteSearched(p0: RideRouteResult?, p1: Int) {
 
+            }
+
+            override fun onInitNaviFailure() {
+
+            }
+
+            override fun onInitNaviSuccess() {
+
+            }
+
+            override fun onGetNavigationText(p0: String?) {
+
+            }
+
+            override fun getInfoWindow(p0: Marker?): View? {
+                return null
+            }
+
+            override fun getInfoContents(p0: Marker?): View {
+                var view:View?=null
+                if (view!=null){
+                    return view
+                }else{
+                    view = View.inflate(this@MapActivity, R.layout.layout_info_contents, null)
+                    val tvNavi = view.findViewById<View>(R.id.tv_navi)
+                    val tvCancel = view.findViewById<View>(R.id.tv_cancel)
+                    tvNavi.setOnClickListener {
+                        GDMapManager.startWalkNavi(mStartLatLonPoint, mEndLatLonPoint,"我的位置",
+                            mMarker?.title.toString()
+                        )
+                    }
+                    tvCancel.setOnClickListener {
+                        mMarker?.hideInfoWindow()
+                    }
+                }
+                return view as View
             }
         })
     }

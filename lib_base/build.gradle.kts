@@ -69,7 +69,7 @@ dependencies {
     api(libs.material)
     api(libs.androidx.activity)
     api(files("libs/BaiduLBS_Android.jar"))
-    api(files("libs/AMap3DMap_10.0.800_AMapSearch_9.7.2_AMapLocation_6.4.5_20240718.jar"))
+    api(files("libs/AMap3DMap_10.0.700_AMapNavi_10.0.700_AMapSearch_9.7.2_AMapLocation_6.4.5_20240508.jar"))
     //运行时注解
     kapt(libs.arouter.compiler)
     api(libs.androidx.core.ktx)

@@ -1,5 +1,6 @@
 package com.example.lib_base.map.imp
 
+import android.view.View
 import com.amap.api.location.AMapLocation
 import com.amap.api.maps.model.Marker
 import com.amap.api.services.core.PoiItemV2
@@ -28,4 +29,9 @@ interface GDMapListener {
     fun onDriveRouteSearched(p0: DriveRouteResult?, p1: Int)
     fun onWalkRouteSearched(p0: WalkRouteResult?, p1: Int)
     fun onRideRouteSearched(p0: RideRouteResult?, p1: Int)
+    fun onInitNaviFailure()
+    fun onInitNaviSuccess()
+    fun onGetNavigationText(p0: String?)
+    fun getInfoWindow(p0: Marker?): View?
+    fun getInfoContents(p0: Marker?): View
 }
