@@ -26,16 +26,16 @@
         android:layout_alignParentBottom="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/mLottieView"
-            android:layout_width="match_parent"
+            android:layout_width="100dp"
             android:layout_height="80dp"
             android:layout_margin="5dp"
-            app:lottie_fileName="voiceloading2.json"
+            app:lottie_fileName="aiVoice.json"
             app:lottie_loop="true"
-            app:lottie_speed="1" />
+            app:lottie_speed="1"/>
         <TextView
             android:layout_margin="10dp"
             android:gravity="center"

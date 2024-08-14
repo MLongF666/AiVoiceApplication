@@ -6,6 +6,10 @@ import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.geocoder.GeocodeResult
 import com.amap.api.services.geocoder.RegeocodeResult
 import com.amap.api.services.poisearch.PoiResultV2
+import com.amap.api.services.route.BusRouteResult
+import com.amap.api.services.route.DriveRouteResult
+import com.amap.api.services.route.RideRouteResult
+import com.amap.api.services.route.WalkRouteResult
 
 /**
  * @description: TODO
@@ -20,4 +24,8 @@ interface GDMapListener {
     fun onPoiSearched(p0: PoiResultV2?, p1: Int)
     fun onPoiItemSearched(p0: PoiItemV2?, p1: Int)
     fun onMarkerClick(it: Marker?)
+    fun onBusRouteSearched(p0: BusRouteResult?, p1: Int)
+    fun onDriveRouteSearched(p0: DriveRouteResult?, p1: Int)
+    fun onWalkRouteSearched(p0: WalkRouteResult?, p1: Int)
+    fun onRideRouteSearched(p0: RideRouteResult?, p1: Int)
 }

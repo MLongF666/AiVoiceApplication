@@ -26,7 +26,7 @@ androidx-viewpager2 = { module = "androidx.viewpager2:viewpager2", version.ref =
 autosize = { module = "me.jessyan:autosize", version.ref = "autosize" }
 gradle = { module = "com.android.tools.build:gradle", version.ref = "gradle" }
 
-lottie = { group = "com.airbnb.android", name = "lottie", version = "4.2.2" }
+lottie = { group = "com.airbnb.android", name = "lottie", version = "6.5.0" }
 #viewpager = { group = "com.zhy", name = "magic-viewpager", version = "1.0.1" }
 mpandroidchart = { module = "com.github.PhilJay:MPAndroidChart", version.ref = "mpandroidchart" }
 permission-v200 = { module = "com.yanzhenjie:permission", version.ref = "permission" }

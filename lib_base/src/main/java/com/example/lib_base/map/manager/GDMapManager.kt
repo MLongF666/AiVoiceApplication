@@ -1,4 +1,4 @@
-package com.example.lib_base.map
+package com.example.lib_base.map.manager
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -16,6 +16,7 @@ import com.amap.api.maps.model.BitmapDescriptorFactory
 import com.amap.api.maps.model.CameraPosition
 import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.MarkerOptions
+import com.amap.api.services.core.AMapException
 import com.amap.api.services.core.LatLonPoint
 import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.geocoder.GeocodeResult
@@ -24,8 +25,14 @@ import com.amap.api.services.geocoder.RegeocodeQuery
 import com.amap.api.services.geocoder.RegeocodeResult
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
+import com.amap.api.services.route.BusRouteResult
+import com.amap.api.services.route.DriveRouteResult
+import com.amap.api.services.route.RideRouteResult
+import com.amap.api.services.route.RouteSearch
+import com.amap.api.services.route.WalkRouteResult
 import com.amap.apis.utils.core.api.AMapUtilCoreApi
 import com.example.lib_base.map.imp.GDMapListener
+import com.example.lib_base.map.overlay.WalkRouteOverlay
 import com.example.lib_base.utils.L
 
 
@@ -37,16 +44,30 @@ import com.example.lib_base.utils.L
  */
 @SuppressLint("StaticFieldLeak")
 object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener,
-    PoiSearchV2.OnPoiSearchListener {
+    PoiSearchV2.OnPoiSearchListener, RouteSearch.OnRouteSearchListener {
     private lateinit var mGeocodeSearch: GeocodeSearch
+    private lateinit var mContext:Context
     //声明AMapLocationClient类对象
     private lateinit var mListener: GDMapListener
     private lateinit var mLocationClient: AMapLocationClient
     private lateinit var option :AMapLocationClientOption
+    private lateinit var mRouteSearch: RouteSearch
     //声明定位回调监听器
     private  var mMapView: MapView?=null
     private lateinit var mMap: AMap
-    fun initMapLocation(mContext: Context){
+    private var query:PoiSearchV2.Query?=null
+    //绑定地图视图
+    fun bindMapView(mMapView: MapView, bundle: Bundle?,mContext: Context){
+        GDMapManager.mMapView = mMapView
+        L.i("mMap init success")
+        GDMapManager.mMapView!!.onCreate(bundle)
+        mMap = GDMapManager.mMapView!!.map
+        initMapLocation(mContext)
+        this.mContext = mContext
+        initRouteSearch(mContext)
+    }
+    //初始化定位
+    private fun initMapLocation(mContext: Context){
         //TODO 定位合规检查
         AMapLocationClient.updatePrivacyShow(mContext,true,true)
         AMapLocationClient.updatePrivacyAgree(mContext,true)
@@ -69,7 +90,7 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
 
         try {
             //初始化定位
-            mLocationClient= AMapLocationClient(mContext)
+            mLocationClient = AMapLocationClient(mContext)
             setCollectInfo(true)
         } catch (e: Exception) {
             L.e("error init location ${e.message}")
@@ -81,6 +102,7 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         mGeocodeSearch = GeocodeSearch(mContext)
         mGeocodeSearch.setOnGeocodeSearchListener(this)
     }
+    //设置定位开关
     fun setSwitchLocation(isSwitch: Boolean){
         if (!isSwitch){
             mLocationClient.stopLocation()
@@ -90,15 +112,17 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
             mLocationClient.setLocationListener(this)
         }
     }
+    //设置地图类型
     fun setMapType(type: Int){
         mMap.mapType = type
     }
     //设置显示当前位置
-    fun setMyLocationEnabled(isEnabled: Boolean){
+    private fun setMyLocationEnabled(isEnabled: Boolean){
         mMap.isMyLocationEnabled = isEnabled
 
 
     }
+    //调整试图中心
     fun setCameraPosition(latLng: LatLng,zoom:Float){
         //参数依次是：视角调整区域的中心点坐标、希望调整到的缩放级别、俯仰角0°~45°（垂直与地图时为0）、偏航角 0~360° (正北方为0)
         val mCameraUpdate = CameraUpdateFactory.newCameraPosition(
@@ -111,32 +135,20 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         )
         mMap.moveCamera(mCameraUpdate)
     }
-    fun bindMapView(mMapView: MapView, bundle: Bundle?,mContext: Context){
-        this.mMapView = mMapView
-        L.i("mMap init success")
-        this.mMapView!!.onCreate(bundle)
-        mMap = this.mMapView!!.map
-        initMapLocation(mContext)
-    }
     fun getAMap(): AMap{
         return mMap
     }
-    private var query:PoiSearchV2.Query?=null
+    //=======================================PIO搜索=============================================
+    //关键字搜索
     fun poiSearchKeyWord(keyWord:String,poiType:String,city :String,currentPage:Int,mContext: Context){
         query = PoiSearchV2.Query(keyWord,poiType, city)
         query!!.pageSize = 10;// 设置每页最多返回多少条poiitem
         query!!.pageNum = currentPage;//设置查询页码
         val poiSearch = PoiSearchV2(mContext, query)
         poiSearch.setOnPoiSearchListener(this)
-
-//        poiSearch.bound = PoiSearchV2.SearchBound(
-//            LatLonPoint(
-//                locationMarker?.position!!.latitude,
-//                locationMarker?.position!!.longitude
-//            ), 1000
-//        ) //设置周边搜索的中心点以及半径
         poiSearch.searchPOIAsyn()
     }
+    //范围搜索
     fun poiSearchAround(keyWord:String,poiType:String,latLonPoint: LatLonPoint,pageNum:Int,pageSize:Int,radius:Int,mContext: Context){
         query = PoiSearchV2.Query(keyWord,poiType)
         query!!.pageSize = pageSize;// 设置每页最多返回多少条poiitem
@@ -151,6 +163,54 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         poiSearch.setOnPoiSearchListener(this)
         poiSearch.searchPOIAsyn()
     }
+    //=======================================导航=============================================
+    private fun initRouteSearch(mContext: Context){
+        mRouteSearch = RouteSearch(mContext)
+        mRouteSearch.setRouteSearchListener(this)
+    }
+    //步行路线规划
+    fun startWalkRouteSearch(mStartPoint: LatLonPoint, mEndPoint: LatLonPoint, mode: Int){
+        val fromAndTo = RouteSearch.FromAndTo(
+            mStartPoint, mEndPoint
+        )
+        //初始化query对象，fromAndTo是包含起终点信息，walkMode是步行路径规划的模式
+        // 步行路径规划
+        val query = RouteSearch.WalkRouteQuery(fromAndTo, mode)
+        mRouteSearch.calculateWalkRouteAsyn(query) // 异步路径规划步行模式查询
+    }
+    //公交路线规划
+    fun startBusRouteSearch(mStartPoint: LatLonPoint, mEndPoint: LatLonPoint, city: String, mode: Int, mCurrentCityName: String){
+        val fromAndTo = RouteSearch.FromAndTo(
+            mStartPoint, mEndPoint
+        )
+        //初始化query对象，fromAndTo是包含起终点信息，city是城市名称
+        // 公交路径规划
+        val query = RouteSearch.BusRouteQuery(
+            fromAndTo, mode,
+            mCurrentCityName, 0
+        ) // 第一个参数表示路径规划的起点和终点，第二个参数表示公交查询模式，第三个参数表示公交查询城市区号，第四个参数表示是否计算夜班车，0表示不计算
+        mRouteSearch.calculateBusRouteAsyn(query) // 异步路径规划公交模式查询
+    }
+    //驾车路线规划
+    fun startDriveRouteSearch(mStartPoint: LatLonPoint, mEndPoint: LatLonPoint, drivingMode: Int){
+        val fromAndTo = RouteSearch.FromAndTo(
+            mStartPoint, mEndPoint
+        )
+        val query = RouteSearch.DriveRouteQuery(
+            fromAndTo, drivingMode, null, null, ""
+        )
+        // fromAndTo包含路径规划的起点和终点，drivingMode表示驾车模式
+        // 第三个参数表示途经点（最多支持6个），第四个参数表示避让区域（最多支持32个），第五个参数表示避让道路
+        mRouteSearch.calculateDriveRouteAsyn(query);
+        // 异步路径规划驾车模式查询
+    }
+    //骑行路线规划
+    fun startRideRouteSearch(mStartPoint: LatLonPoint, mEndPoint: LatLonPoint, mode: Int){
+        val fromAndTo = RouteSearch.FromAndTo(mStartPoint, mEndPoint)
+        val query: RouteSearch.RideRouteQuery = RouteSearch.RideRouteQuery(fromAndTo, mode)
+        mRouteSearch.calculateRideRouteAsyn(query)
+    }
+
     //设置是否允许采集个人设备信息
     private fun setCollectInfo(enable: Boolean){
         AMapUtilCoreApi.setCollectInfoEnable(enable);
@@ -159,45 +219,6 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
     fun setTerrainEnable(enable: Boolean){
         MapsInitializer.setTerrainEnable(enable)
     }
-    fun onResume(){
-        mMapView?.onResume()
-    }
-    fun onPause(){
-        mMapView?.onPause()
-    }
-    fun onDestroy(){
-        mMapView?.onDestroy()
-    }
-
-    fun setGDMapListener(listener: GDMapListener){
-        this.mListener = listener
-    }
-    override fun onLocationChanged(p0: AMapLocation?) {
-        L.i("onLocationChanged ${p0?.latitude}")
-        p0?.let {
-            val latLonPoint = LatLonPoint(p0.latitude, p0.longitude)
-            val query = RegeocodeQuery(latLonPoint, 200f, GeocodeSearch.AMAP)
-            mGeocodeSearch.getFromLocationAsyn(query);
-        }
-        mListener.onLocationChanged(p0)
-    }
-
-    override fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int) {
-        mListener.onRegeocodeSearched(p0,p1)
-    }
-
-    override fun onGeocodeSearched(p0: GeocodeResult?, p1: Int) {
-        mListener.onGeocodeSearched(p0,p1)
-    }
-
-    override fun onPoiSearched(p0: PoiResultV2?, p1: Int) {
-            mListener.onPoiSearched(p0,p1)
-    }
-
-    override fun onPoiItemSearched(p0: PoiItemV2?, p1: Int) {
-        mListener.onPoiItemSearched(p0,p1)
-    }
-
     fun addMarkerDefault(
         latLng: LatLng, tiitle: String,
         snippet: String?
@@ -254,5 +275,80 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         mMap.addMarker(markerOption)
         // 绑定 Marker 被点击事件
         mMap.setOnMarkerClickListener(markerClickListener)
+    }
+    private fun planWalkRoute(result: WalkRouteResult?, p1: Int) {
+        mMap.clear()
+        var mWalkRouteResult: WalkRouteResult? = null
+        if (p1== AMapException.CODE_AMAP_SUCCESS) {
+            if (result!=null&&result.paths!=null)
+                mWalkRouteResult=result
+            val walkPath = mWalkRouteResult?.paths?.get(0) ?: return
+            val walkRouteOverlay = WalkRouteOverlay(
+                mContext, mMap, walkPath,
+                mWalkRouteResult.startPos,
+                mWalkRouteResult.targetPos
+            )
+            walkRouteOverlay.removeFromMap()
+            walkRouteOverlay.addToMap()
+            walkRouteOverlay.zoomToSpan()
+
+        }
+    }
+    fun setGDMapListener(listener: GDMapListener){
+        mListener = listener
+    }
+    fun onResume(){
+        mMapView?.onResume()
+    }
+    fun onPause(){
+        mMapView?.onPause()
+    }
+    fun onDestroy(){
+        mMapView?.onDestroy()
+    }
+    override fun onLocationChanged(p0: AMapLocation?) {
+        L.i("onLocationChanged ${p0?.latitude}")
+        p0?.let {
+            val latLonPoint = LatLonPoint(p0.latitude, p0.longitude)
+            val query = RegeocodeQuery(latLonPoint, 200f, GeocodeSearch.AMAP)
+            mGeocodeSearch.getFromLocationAsyn(query);
+        }
+        mListener.onLocationChanged(p0)
+    }
+    override fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int) {
+        mListener.onRegeocodeSearched(p0,p1)
+    }
+    override fun onGeocodeSearched(p0: GeocodeResult?, p1: Int) {
+        mListener.onGeocodeSearched(p0,p1)
+    }
+    override fun onPoiSearched(p0: PoiResultV2?, p1: Int) {
+            mListener.onPoiSearched(p0,p1)
+    }
+    override fun onPoiItemSearched(p0: PoiItemV2?, p1: Int) {
+        mListener.onPoiItemSearched(p0,p1)
+    }
+    override fun onBusRouteSearched(p0: BusRouteResult?, p1: Int) {
+        //BusRouteResult 公交换乘方案结果
+        mListener.onBusRouteSearched(p0,p1)
+    }
+
+    override fun onDriveRouteSearched(p0: DriveRouteResult?, p1: Int) {
+        //DriveRouteResult 驾车方案结果
+        mListener.onDriveRouteSearched(p0,p1)
+    }
+
+    override fun onWalkRouteSearched(result: WalkRouteResult?, p1: Int) {
+        //    WalkRouteResult 步行方案结果
+        mListener.onWalkRouteSearched(result,p1)
+        //规划路线方法
+        planWalkRoute(result,p1)
+
+    }
+
+
+
+    override fun onRideRouteSearched(p0: RideRouteResult?, p1: Int) {
+        //RideRouteResult 骑行方案结果
+        mListener.onRideRouteSearched(p0,p1)
     }
 }

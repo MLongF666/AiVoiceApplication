@@ -8,8 +8,6 @@ import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.`fun`.AppHelper
 import com.example.lib_base.helper.`fun`.CommonSettingHelper
 import com.example.lib_base.helper.`fun`.ConsTellHelper
-import com.example.lib_base.map.BDMapManager
-import com.example.lib_base.map.GDMapManager
 import com.example.lib_base.utils.AssetUtils
 import com.example.lib_base.utils.L
 import com.example.lib_base.utils.SpUtil

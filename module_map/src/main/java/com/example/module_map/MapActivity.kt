@@ -15,7 +15,6 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.amap.api.location.AMapLocation
 import com.amap.api.maps.AMap
 import com.amap.api.maps.MapView
-import com.amap.api.maps.model.BitmapDescriptorFactory
 import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.Marker
 import com.amap.api.services.core.LatLonPoint
@@ -23,10 +22,15 @@ import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.geocoder.GeocodeResult
 import com.amap.api.services.geocoder.RegeocodeResult
 import com.amap.api.services.poisearch.PoiResultV2
+import com.amap.api.services.route.BusRouteResult
+import com.amap.api.services.route.DriveRouteResult
+import com.amap.api.services.route.RideRouteResult
+import com.amap.api.services.route.RouteSearch
+import com.amap.api.services.route.WalkRouteResult
 import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.helper.ARouterHelper
-import com.example.lib_base.map.GDMapManager
 import com.example.lib_base.map.imp.GDMapListener
+import com.example.lib_base.map.manager.GDMapManager
 import com.example.lib_base.utils.L
 import com.example.module_map.databinding.ActivityMapBinding
 import com.yanzhenjie.permission.Action
@@ -34,6 +38,8 @@ import com.yanzhenjie.permission.Action
 
 @Route(path = ARouterHelper.PATH_MAP)
 class MapActivity : BaseActivity<ActivityMapBinding>() {
+    private lateinit var mStartLatLonPoint: LatLonPoint
+    private lateinit var mEndLatLonPoint: LatLonPoint
     private val POSITION_REQUEST_CODE: Int = 100
     private var mBundle:Bundle?=null
     private lateinit var mMapView: MapView
@@ -42,13 +48,14 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
         Manifest.permission.VIBRATE,
         Manifest.permission.CAMERA,
         Manifest.permission.ACCESS_FINE_LOCATION,
-        Manifest.permission.ACCESS_COARSE_LOCATION,
+        Manifest.permission.ACCESS_COARSE_LOCATION
     )
     override fun getTitleText(): String {
         return "地图"
     }
 
     override fun initEvent() {
+
     }
 
     override fun initData() {
@@ -88,7 +95,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
         }
         markers = resources.obtainTypedArray(R.array.Markers)
     }
-    private var latLonPoint=LatLonPoint(0.0,0.0)
+    private var mPositonLatLonPoint=LatLonPoint(0.0,0.0)
     private fun setLocation() {
         GDMapManager.setGDMapListener(object : GDMapListener {
             override fun onLocationChanged(var1: AMapLocation?) {
@@ -100,19 +107,36 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
                                 "定位成功${it.locationType},${it.latitude}," +
                                         "${it.longitude},${it.city},${it.address}"
                             )
-                            latLonPoint = LatLonPoint(it.latitude, it.longitude)
-                            GDMapManager.poiSearchAround("生活服务","",latLonPoint,1,10,10000,this@MapActivity)
-                            GDMapManager.setCameraPosition(LatLng(it.latitude, it.longitude), 18f)
-                            GDMapManager.addMarkerDefault(LatLng(it.latitude, it.longitude), "当前位置", "")
+                            mPositonLatLonPoint = LatLonPoint(it.latitude, it.longitude)
+                            mStartLatLonPoint = mPositonLatLonPoint
+                            //定位成功之后开始POI搜索
+//                            GDMapManager.poiSearchAround(
+//                                "生活服务",
+//                                "",
+//                                latLonPoint,
+//                                1,
+//                                10,
+//                                10000,
+//                                this@MapActivity
+//                            )
+                            GDMapManager.setCameraPosition(LatLng(it.latitude, it.longitude), 15f)
+                            GDMapManager.addMarkerDefault(
+                                LatLng(it.latitude, it.longitude),
+                                "当前位置",
+                                ""
+                            )
                         }
+
                         else -> {
                             L.i("定位:${it.toString()}")
                         }
                     }
                 }
             }
+
             override fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int) {
                 p0?.regeocodeAddress?.let {
+
                     L.i(
                         "onRegeocodeSearched: MapActivity ${it.formatAddress},${it.country}" +
                                 "${it.province},${it.city},${it.district}"
@@ -120,34 +144,62 @@ class MapActivity : BaseActivity<ActivityMapBinding>() {
                 }
 
             }
+
             override fun onGeocodeSearched(p0: GeocodeResult?, p1: Int) {
                 L.i("onGeocodeSearched: ${p0?.geocodeQuery},${p1}")
             }
 
             override fun onPoiSearched(p0: PoiResultV2?, p1: Int) {
-                if (p1==1000){
+                if (p1 == 1000) {
                     L.i("onPoiSearched: ${p0?.pois?.size}")
                     //将 POI 显示在地图上
                     p0?.let {
                         //将查询到的 POI 以绘制点的方式显示在地图上
-                        it.pois.forEachIndexed {index, poiItem ->
+                        it.pois.forEachIndexed { index, poiItem ->
                             val markerId = markers?.getResourceId(index, 0)
                             GDMapManager.addMarker(
                                 LatLng(poiItem.latLonPoint.latitude, poiItem.latLonPoint.longitude),
-                                poiItem.title, poiItem.snippet,this@MapActivity,markerId!!)
+                                poiItem.title, poiItem.snippet, this@MapActivity, markerId!!
+                            )
                         }
                     }
                 }
             }
+
             override fun onPoiItemSearched(p0: PoiItemV2?, p1: Int) {
                 L.i("onPoiItemSearched: ${p0?.toString()},${p1}")
             }
+
             override fun onMarkerClick(it: Marker?) {
                 L.i("onMarkerClick: ${it?.title}")
                 Toast.makeText(this@MapActivity, it?.title, Toast.LENGTH_SHORT).show()
                 it?.let {
-
+                    val position = it.position
+                    mEndLatLonPoint = LatLonPoint(position.latitude, position.longitude)
+                    if(mStartLatLonPoint.latitude!=0.0&&mEndLatLonPoint.latitude!=0.0){
+                        GDMapManager.startWalkRouteSearch(
+                            mStartLatLonPoint,
+                            mEndLatLonPoint,
+                            RouteSearch.WalkDefault
+                        )
+                    }
+                    L.i("onMarkerClick: ${mStartLatLonPoint.toString()},${mEndLatLonPoint.toString()}")
                 }
+            }
+
+            override fun onBusRouteSearched(p0: BusRouteResult?, p1: Int) {
+
+            }
+
+            override fun onDriveRouteSearched(p0: DriveRouteResult?, p1: Int) {
+
+            }
+            @SuppressLint("SuspiciousIndentation")
+            override fun onWalkRouteSearched(p0: WalkRouteResult?, p1: Int) {
+            }
+
+            override fun onRideRouteSearched(p0: RideRouteResult?, p1: Int) {
+
             }
         })
     }

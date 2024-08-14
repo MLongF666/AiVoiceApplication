@@ -1,4 +1,4 @@
-package com.example.lib_base.map
+package com.example.lib_base.map.manager
 
 import android.content.Context
 import com.baidu.location.LocationClient
@@ -29,8 +29,8 @@ object BDMapManager {
     }
 
     fun bindMapView(mMapView: MapView){
-        this.mMapView = mMapView
-        mBaiduMap= mMapView.map
+        BDMapManager.mMapView = mMapView
+        mBaiduMap = mMapView.map
         //默认缩放
         zoomMap(MAX_ZOOM)
         //默认卫星地图

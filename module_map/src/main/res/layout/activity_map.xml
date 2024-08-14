@@ -6,11 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MapActivity">
-<!--<com.baidu.mapapi.map.MapView-->
-<!--    android:id="@+id/mMapView"-->
-<!--    android:layout_width="match_parent"-->
-<!--    android:layout_height="match_parent"/>-->
-
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+    </LinearLayout>
     <com.amap.api.maps.MapView
         android:id="@+id/map"
         android:layout_width="match_parent"
