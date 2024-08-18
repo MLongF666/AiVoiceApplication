@@ -19,7 +19,6 @@ import com.amap.api.services.route.WalkRouteResult
  * @version: 1.0
  */
 interface GDMapListener {
-    fun onLocationChanged(var1: AMapLocation?)
     fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int)
     fun onGeocodeSearched(p0: GeocodeResult?, p1: Int)
     fun onPoiSearched(p0: PoiResultV2?, p1: Int)

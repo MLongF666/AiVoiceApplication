@@ -1,16 +1,11 @@
 package com.example.aivoiceapplication
-
-
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.media.AudioFormat
 import android.media.AudioManager
-import android.media.AudioRecord
-import android.media.MediaRecorder
 import android.os.Handler
 import android.os.IBinder
 import android.view.View
@@ -19,10 +14,8 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.cardview.widget.CardView
-import androidx.databinding.DataBindingUtil.getBinding
 import androidx.viewpager2.widget.CompositePageTransformer
 import androidx.viewpager2.widget.MarginPageTransformer
-import com.chrischen.waveview.WaveView
 import com.example.aivoiceapplication.data.MainListData
 import com.example.aivoiceapplication.databinding.ActivityMainBinding
 import com.example.aivoiceapplication.service.VoiceService
@@ -36,10 +29,8 @@ import com.example.lib_base.trasformer.ScaleInTransformer
 import com.example.lib_base.utils.L
 import com.example.lib_voice.helper.AudioManagerHelper
 import com.example.lib_voice.helper.VolumeChangeObserver
-import kotlin.math.abs
 
-
-class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.VolumeChangeListener {
+class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.VolumeChangeListener,VoiceService.OnVoiceListener {
     private val permissions = arrayOf(
         Manifest.permission.RECORD_AUDIO,
         Manifest.permission.CALL_PHONE,
@@ -49,9 +40,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.ACCESS_COARSE_LOCATION,
     )
-
-    private val mUiHandler = Handler()
-    private lateinit var mOnVoiceListener: VoiceService.OnVoiceListener
+    private var mVoiceService: VoiceService?=null
     private var arrayList = ArrayList<String>()
     private var mList = ArrayList<MainListData>()
     private lateinit var mVolumeChangeObserver: VolumeChangeObserver
@@ -61,7 +50,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
 
     override fun initEvent() {
         getBinding().buttonVoice.setOnClickListener {
-            mOnVoiceListener.wakeUpFix()
+            mVoiceService?.wakeUpFix()
         }
         mVolumeChangeObserver.volumeChangeListener = this
         AudioManagerHelper.setOnMyAudioFocusChangeListener(object :AudioManagerHelper.OnMyAudioFocusChangeListener{
@@ -116,8 +105,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
         }
         initPageData()
         initPageView()
-        val intent = Intent(this, VoiceService::class.java)
-        bindService(intent, MyConnection(), Context.BIND_AUTO_CREATE)
     }
 
     private fun initPageView() {
@@ -160,7 +147,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
         getBinding().viewPager.setPageTransformer(transformer)
         commonAdapter.setOnItemClick(object : OnItemClick<MainListData> {
             override fun onItemClick(position: Int, view: View, t: MainListData) {
-                Toast.makeText(this@MainActivity, t.title, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this@MainActivity, t.title, Toast.LENGTH_SHORT).show()
                 when (t.title) {
                     "应用管理" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_APP_MANAGER)
@@ -202,7 +189,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
     }
     override fun onStop() {
         super.onStop()
-        ReadAudioThread().interrupt()//停止线程
     }
     @SuppressLint("Recycle")
     private fun initPageData() {
@@ -211,7 +197,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
         val colorsArray = resources.getIntArray(R.array.MainColorArray)
         val iconsArray = resources.obtainTypedArray(R.array.MainIconArray)
         val descriptionArray = resources.getStringArray(R.array.MainDescriptionArray)
-
         for ((index, value) in titleArray.withIndex()) {
             mList.add(
                 MainListData(
@@ -224,64 +209,27 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
     }
     private fun linkService() {
         ContactHelper.init(this)
-        ReadAudioThread().start()
-
-        startService(Intent(this, VoiceService::class.java))
+        val intent = Intent(this, VoiceService::class.java)
+        startService(intent)
+        bindService(intent, MyConnection(), Context.BIND_AUTO_CREATE)
     }
     internal inner class MyConnection : ServiceConnection {
         override fun onServiceDisconnected(p0: ComponentName?) {
         }
         override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-            mOnVoiceListener = p1 as VoiceService.OnVoiceListener//对象的强制转换
+            val binder = p1 as VoiceService.LocalBinder
+            mVoiceService = binder.getService()
+            mVoiceService?.setOnVoiceListener(this@MainActivity)
+
         }
+
     }
     override fun onVolumeChanged(volume: Int) {
         L.d("onVolumeChanged MainActivity: $volume")
     }
-    //读取音频线程
-    inner class ReadAudioThread(): Thread() {
-        var amplitude = 0
-        private val audioSource = MediaRecorder.AudioSource.MIC
-        private val sampleRate = 44100
-        private val channelConfig = AudioFormat.CHANNEL_IN_MONO
-        private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-        private var bufferSize: Int = 1024
-        private var audioRecord: AudioRecord? = null
-        @SuppressLint("MissingPermission")
-        override fun run() {
-            try {
-                bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
-                audioRecord = AudioRecord(audioSource, sampleRate, channelConfig, audioFormat, bufferSize)
-                audioRecord!!.startRecording() //开录
-                while (true) {
-                    sleep(50)
-                    val audioData = ShortArray(bufferSize)
-                    val readSize = audioRecord!!.read(audioData, 0, bufferSize)
-                    var sum: Long = 0
-                    for (i in 0 until readSize) {
-                        sum += abs(audioData[i].toInt()).toLong()
-                    }
-                    if (readSize > 0) {
-                        amplitude = (sum / readSize).toInt()
-                        L.d("amplitude: $amplitude")
-                        //向主线程发送消息
-                        val runnable = Runnable(object : Runnable, () -> Unit {
-                            override fun run() {
-                                getBinding().waveView.putValue(amplitude)
-                                getBinding().waveView.invalidate()
-                                L.d("form ReadAudioThread: amplitude: $amplitude")
-                            }
-                            override fun invoke() {
-                                run()
-                            }
-                        })
-                        mUiHandler.post(runnable)//发送消息
-                    }
-                }
-            }catch (e: Exception){
-                e.printStackTrace()
-            }
 
-        }
+    override fun setAmplitude(a: Int) {
+        getBinding().waveView.putValue(a)
+        getBinding().waveView.invalidate()
     }
 }

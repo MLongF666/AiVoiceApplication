@@ -66,4 +66,8 @@ object ARouterHelper {
         ARouter.getInstance().build(path).withObject(key,value).navigation()
     }
 
+    fun startActivity(path: String, key: String, value: String, key1: String, value1: String) {
+        ARouter.getInstance().build(path).withString(key, value).withString(key1, value1).navigation()
+    }
+
 }

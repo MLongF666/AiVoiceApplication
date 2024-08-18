@@ -1,8 +1,11 @@
 package com.example.aivoiceapplication.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
-import android.media.AudioManager
+import android.media.AudioFormat
+import android.media.AudioRecord
+import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
@@ -17,6 +20,8 @@ import com.example.aivoiceapplication.adapter.ChatListAdapter
 import com.example.aivoiceapplication.data.ChatListData
 import com.example.aivoiceapplication.entity.AppConstants
 import com.example.lib_base.helper.ARouterHelper
+import com.example.lib_base.helper.InputKeyHelper
+import com.example.lib_base.helper.InputKeyHelper.execByRuntime
 import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.helper.SoundPoolHelper
 import com.example.lib_base.helper.WindowsHelper
@@ -39,6 +44,7 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import kotlin.math.abs
 
 
 /**
@@ -48,7 +54,6 @@ import retrofit2.Response
  * @version: 1.0
  */
 class VoiceService : Service(), OnNluResultListener {
-    private lateinit var mAudioManager: AudioManager
     private lateinit var  textViewTips:TextView
     private lateinit var  mLottieAnimationView:LottieAnimationView
     private var chatListAdapter: ChatListAdapter? = null
@@ -84,6 +89,7 @@ class VoiceService : Service(), OnNluResultListener {
         mFullWindowsView.findViewById<ImageView>(R.id.ivCloseWindow).setOnClickListener {
             hideWindow()
         }
+        ReadAudioThread().start()
         val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd=true
         mChatListView.layoutManager= layoutManager
@@ -149,6 +155,10 @@ class VoiceService : Service(), OnNluResultListener {
         })
     }
 
+    override fun onUnbind(intent: Intent?): Boolean {
+        ReadAudioThread().interrupt()
+        return super.onUnbind(intent)
+    }
 
     //绑定通知栏
     private fun bindNotification() {
@@ -284,7 +294,7 @@ class VoiceService : Service(), OnNluResultListener {
     }
     override fun otherApp(appName: String) {
         //跳转应用商店
-        var isStore = AppHelper.launcherAppStore(appName)
+        val isStore = AppHelper.launcherAppStore(appName)
         if (isStore) {
             addAiText(getString(R.string.text_voice_app_option, appName))
         }else{
@@ -293,29 +303,47 @@ class VoiceService : Service(), OnNluResultListener {
     }
 
     override fun back(){
-        L.i("返回back")
-        CommonSettingHelper.back()
+        addAiText("正在返回",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                InputKeyHelper.back()
+            }
+        })
     }
 
-    override fun home(): Any? {
-        TODO("Not yet implemented")
+    override fun home() {
+        addAiText("正在为您返回主页",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                InputKeyHelper.home()
+            }
+        })
+        hideWindow()
     }
 
-    override fun setVolumeUp(): Any? {
-        TODO("Not yet implemented")
+    override fun setVolumeUp() {
+        addAiText("正在调整音量",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                InputKeyHelper.setVolumeUp()
+            }
+        })
+        hideWindow()
     }
 
-    override fun setVolumeDown(): Any? {
-        TODO("Not yet implemented")
+    override fun setVolumeDown(){
+        addAiText("正在调整音量",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                InputKeyHelper.setVolumeDown()
+            }
+        })
+        hideWindow()
     }
 
-    override fun quit(): Any? {
-        TODO("Not yet implemented")
+    override fun quit(){
+        hideWindow()
     }
 
     //拨打联系人
     override fun callPhoneForName(name: String) {
-        var list =ContactHelper.getContactList().filter { it.phoneName == name}
+        val list =ContactHelper.getContactList().filter { it.phoneName == name}
         if (list.isNotEmpty()) {
             L.i("拨打联系人列表${list}")
             addAiText("正在为您拨打联系人:$name",object :VoiceTTs.OnTTSResultListener{
@@ -390,11 +418,21 @@ class VoiceService : Service(), OnNluResultListener {
     }
 
     override fun routeMap(word: String) {
-        TODO("Not yet implemented")
+        addAiText("正在为您导航到$word")
+        //跳转到地图
+        ARouterHelper.startActivity(ARouterHelper.PATH_MAP,"type","route","keyword",word)
+        hideWindow()
     }
 
     override fun nearByMap(word: String) {
-        TODO("Not yet implemented")
+        addAiText("正在为您搜索周边$word",object :VoiceTTs.OnTTSResultListener{
+            override fun onTTEnd() {
+                //跳转到地图
+                ARouterHelper.startActivity(ARouterHelper.PATH_MAP,"type","poi",
+                    "keyword",word)
+                hideWindow()
+            }
+        })
     }
 
     override fun aiRobot(string: String) {
@@ -410,11 +448,9 @@ class VoiceService : Service(), OnNluResultListener {
                         })
                 }
             }
-
             override fun onFailure(p0: Call<AiRootBean>, p1: Throwable) {
                 L.e("机器人请求失败${p1.message}")
             }
-
         })
 
     }
@@ -424,12 +460,59 @@ class VoiceService : Service(), OnNluResultListener {
         hideWindow()
     }
     interface OnVoiceListener{
-        fun wakeUpFix()
+        fun setAmplitude(a:Int)
     }
-    internal inner class LocalBinder : Binder(),OnVoiceListener {
-        override fun wakeUpFix() {
-            this@VoiceService.wakeUpFix()
+    private var mListener: OnVoiceListener? = null
+    inner class LocalBinder : Binder() {
+        fun getService(): VoiceService {
+            return this@VoiceService
         }
+    }
+    fun setOnVoiceListener(listener:OnVoiceListener){
+        mListener = listener
+    }
 
+    //读取音频线程
+    inner class ReadAudioThread(): Thread() {
+        private val audioSource = MediaRecorder.AudioSource.MIC
+        private val sampleRate = 44100
+        private val channelConfig = AudioFormat.CHANNEL_IN_MONO
+        private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
+        private var bufferSize: Int = 1024
+        private var audioRecord: AudioRecord? = null
+        @SuppressLint("MissingPermission")
+        override fun run() {
+            try {
+                bufferSize = AudioRecord.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+                audioRecord = AudioRecord(audioSource, sampleRate, channelConfig, audioFormat, bufferSize)
+                audioRecord!!.startRecording() //开录
+                while (true) {
+                    sleep(50)
+                    val audioData = ShortArray(bufferSize)
+                    val readSize = audioRecord!!.read(audioData, 0, bufferSize)
+                    var sum: Long = 0
+                    for (i in 0 until readSize) {
+                        sum += abs(audioData[i].toInt()).toLong()
+                    }
+                    if (readSize > 0) {
+                        val a = (sum / readSize).toInt()
+                        //向主线程发送消息
+                        val runnable = Runnable(object : Runnable, () -> Unit {
+                            override fun run() {
+                                mListener?.setAmplitude(a)
+                                L.i("当前音量$a")
+                            }
+                            override fun invoke() {
+                                run()
+                            }
+                        })
+                        mHandler.post(runnable)//发送消息
+                    }
+                }
+            }catch (e: Exception){
+                e.printStackTrace()
+            }
+
+        }
     }
 }

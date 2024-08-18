@@ -3,8 +3,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.View
-import com.amap.api.location.AMapLocation
 import com.amap.api.location.AMapLocationClient
 import com.amap.api.location.AMapLocationClientOption
 import com.amap.api.location.AMapLocationListener
@@ -18,12 +18,14 @@ import com.amap.api.maps.model.LatLng
 import com.amap.api.maps.model.Marker
 import com.amap.api.maps.model.MarkerOptions
 import com.amap.api.maps.model.Poi
+import com.amap.api.navi.AMapNavi
 import com.amap.api.navi.AMapNaviListener
 import com.amap.api.navi.AmapNaviPage
 import com.amap.api.navi.AmapNaviParams
 import com.amap.api.navi.AmapNaviType
 import com.amap.api.navi.AmapPageType
 import com.amap.api.navi.INaviInfoCallback
+import com.amap.api.navi.enums.TravelStrategy
 import com.amap.api.navi.model.AMapCalcRouteResult
 import com.amap.api.navi.model.AMapLaneInfo
 import com.amap.api.navi.model.AMapModelCross
@@ -36,12 +38,11 @@ import com.amap.api.navi.model.AMapServiceAreaInfo
 import com.amap.api.navi.model.AimLessModeCongestionInfo
 import com.amap.api.navi.model.AimLessModeStat
 import com.amap.api.navi.model.NaviInfo
-import com.amap.api.services.core.AMapException
+import com.amap.api.navi.model.NaviPoi
 import com.amap.api.services.core.LatLonPoint
 import com.amap.api.services.core.PoiItemV2
 import com.amap.api.services.geocoder.GeocodeResult
 import com.amap.api.services.geocoder.GeocodeSearch
-import com.amap.api.services.geocoder.RegeocodeQuery
 import com.amap.api.services.geocoder.RegeocodeResult
 import com.amap.api.services.poisearch.PoiResultV2
 import com.amap.api.services.poisearch.PoiSearchV2
@@ -52,7 +53,6 @@ import com.amap.api.services.route.RouteSearch
 import com.amap.api.services.route.WalkRouteResult
 import com.amap.apis.utils.core.api.AMapUtilCoreApi
 import com.example.lib_base.map.imp.GDMapListener
-import com.example.lib_base.map.overlay.WalkRouteOverlay
 import com.example.lib_base.utils.L
 
 
@@ -63,7 +63,7 @@ import com.example.lib_base.utils.L
  * @version: 1.0
  */
 @SuppressLint("StaticFieldLeak")
-object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener, INaviInfoCallback,
+object GDMapManager : GeocodeSearch.OnGeocodeSearchListener, INaviInfoCallback,
     PoiSearchV2.OnPoiSearchListener, RouteSearch.OnRouteSearchListener, AMapNaviListener,
     AMap.InfoWindowAdapter {
     private lateinit var mGeocodeSearch: GeocodeSearch
@@ -83,9 +83,9 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         L.i("mMap init success")
         GDMapManager.mMapView!!.onCreate(bundle)
         mMap = GDMapManager.mMapView!!.map
-        initMapLocation(mContext)
         this.mContext = mContext
         initRouteSearch(mContext)
+        initMapLocation(mContext)
     }
     //初始化定位
     private fun initMapLocation(mContext: Context){
@@ -117,20 +117,17 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
             L.e("error init location ${e.message}")
         }
         mLocationClient.setLocationOption(option)
-        //设置场景模式后最好调用一次stop，再调用start以保证场景模式生效
-        setSwitchLocation(true)
-        setMyLocationEnabled(false)
         mGeocodeSearch = GeocodeSearch(mContext)
         mGeocodeSearch.setOnGeocodeSearchListener(this)
     }
     //设置定位开关
-    fun setSwitchLocation(isSwitch: Boolean){
+    fun setSwitchLocation(isSwitch: Boolean,mListener: AMapLocationListener?){
         if (!isSwitch){
             mLocationClient.stopLocation()
         }else{
             mLocationClient.stopLocation()
             mLocationClient.startLocation()
-            mLocationClient.setLocationListener(this)
+            mLocationClient.setLocationListener(mListener)
         }
     }
     //设置地图类型
@@ -159,7 +156,7 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
     }
     //=======================================PIO搜索=============================================
     //关键字搜索
-    fun poiSearchKeyWord(keyWord:String,poiType:String,city :String,currentPage:Int,mContext: Context){
+    fun poiSearchKeyWord(keyWord:String,poiType:String,city :String,currentPage:Int){
         query = PoiSearchV2.Query(keyWord,poiType, city)
         query!!.pageSize = 10;// 设置每页最多返回多少条poiitem
         query!!.pageNum = currentPage;//设置查询页码
@@ -168,7 +165,7 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         poiSearch.searchPOIAsyn()
     }
     //范围搜索
-    fun poiSearchAround(keyWord:String,poiType:String,latLonPoint: LatLonPoint,pageNum:Int,pageSize:Int,radius:Int,mContext: Context){
+    fun poiSearchAround(keyWord:String,poiType:String,latLonPoint: LatLng,pageNum:Int,pageSize:Int,radius:Int,mContext: Context){
         query = PoiSearchV2.Query(keyWord,poiType)
         query!!.pageSize = pageSize;// 设置每页最多返回多少条poiitem
         query!!.pageNum = pageNum;//设置查询页码
@@ -188,14 +185,19 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         mRouteSearch.setRouteSearchListener(this)
     }
     //步行路线规划
-    fun startWalkRouteSearch(mStartPoint: LatLonPoint, mEndPoint: LatLonPoint, mode: Int){
-        val fromAndTo = RouteSearch.FromAndTo(
-            mStartPoint, mEndPoint
-        )
-        //初始化query对象，fromAndTo是包含起终点信息，walkMode是步行路径规划的模式
-        // 步行路径规划
-        val query = RouteSearch.WalkRouteQuery(fromAndTo, mode)
-        mRouteSearch.calculateWalkRouteAsyn(query) // 异步路径规划步行模式查询
+    fun startWalkRouteSearch(mStartPoint: LatLng, mEndPoint: LatLonPoint?, keyword: String?){
+        var end=NaviPoi(keyword, null, "")
+        end = if (mEndPoint!=null){
+            // 构造终点POI
+            NaviPoi(keyword, LatLng(mEndPoint.latitude, mEndPoint.longitude), "")
+        }else{
+            NaviPoi(keyword, null, "")
+        }
+        // 构造起点POI
+        val start = NaviPoi("故宫博物馆",mStartPoint , "B000A8UIN8")
+
+        // 进行骑行算路
+        AMapNavi.getInstance(mContext).calculateRideRoute(start, end, TravelStrategy.SINGLE)
     }
     //公交路线规划
     fun startBusRouteSearch(mStartPoint: LatLonPoint, mEndPoint: LatLonPoint, city: String, mode: Int, mCurrentCityName: String){
@@ -230,21 +232,25 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         mRouteSearch.calculateRideRouteAsyn(query)
     }
     //开启步行导航
-    fun startWalkNavi(startPoint: LatLonPoint, endPoint: LatLonPoint,startName:String,endName:String){
-        val startLatLng = LatLng(startPoint.latitude, startPoint.longitude)
+    fun startWalkNavi(startPoint: LatLng, endPoint: LatLng?, startName:String, endName:String){
         //起点
-        val start: Poi = Poi(startName, startLatLng, "B000A28DAE")
-        val endLatLng = LatLng(endPoint.latitude, endPoint.longitude)
+        val start: Poi = Poi(startName, startPoint, "")
       //途经点
 //        val poiList: ArrayList<Poi> = ArrayList<Poi>()
 //        poiList.add(Poi(endName, LatLng(39.918058, 116.397026), "B000A8UIN8"))
         //终点
-        val end: Poi = Poi(endName, endLatLng, null)
+        val end: Poi = Poi(endName, endPoint, "")
+        L.i("endName: $endName")
         // 组件参数配置 //最后一个参数，AmapPageType.NAVI为导航界面，AmapPageType.ROUTE为路线规划界面
         val params = AmapNaviParams(start, null, end, AmapNaviType.DRIVER, AmapPageType.ROUTE)
+        params.setNeedDestroyDriveManagerInstanceWhenNaviExit(true) //退出导航后是否释放导航资源
+        params.setUseInnerVoice(false)
+        params.setMultipleRouteNaviMode(true)
+//        // 是否计算路径规划时
+//        params.setNeedCalculateRouteWhenPresent(false)
         // 启动组件
-        AmapNaviPage.getInstance().showRouteActivity(mContext.applicationContext, params, this)
-        L.i("startWalkNavi: ${startPoint.latitude} ${startPoint.longitude} ${endLatLng.latitude} ${endLatLng.longitude}")
+        val naviPage = AmapNaviPage.getInstance()
+        naviPage.showRouteActivity(mContext.applicationContext, params, this)
     }
     //设置是否允许采集个人设备信息
     private fun setCollectInfo(enable: Boolean){
@@ -312,24 +318,6 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         mMap.setOnMarkerClickListener(markerClickListener)
         mMap.setInfoWindowAdapter(this)
     }
-//    private fun planWalkRoute(result: WalkRouteResult?, p1: Int) {
-//        mMap.clear()
-//        var mWalkRouteResult: WalkRouteResult? = null
-//        if (p1== AMapException.CODE_AMAP_SUCCESS) {
-//            if (result!=null&&result.paths!=null)
-//                mWalkRouteResult=result
-//            val walkPath = mWalkRouteResult?.paths?.get(0) ?: return
-//            val walkRouteOverlay = WalkRouteOverlay(
-//                mContext, mMap, walkPath,
-//                mWalkRouteResult.startPos,
-//                mWalkRouteResult.targetPos
-//            )
-//            walkRouteOverlay.removeFromMap()
-//            walkRouteOverlay.addToMap()
-//            walkRouteOverlay.zoomToSpan()
-//
-//        }
-//    }
     fun setGDMapListener(listener: GDMapListener){
         mListener = listener
     }
@@ -341,15 +329,6 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
     }
     fun onDestroy(){
         mMapView?.onDestroy()
-    }
-    override fun onLocationChanged(p0: AMapLocation?) {
-        L.i("onLocationChanged ${p0?.latitude}")
-        p0?.let {
-            val latLonPoint = LatLonPoint(p0.latitude, p0.longitude)
-            val query = RegeocodeQuery(latLonPoint, 200f, GeocodeSearch.AMAP)
-            mGeocodeSearch.getFromLocationAsyn(query);
-        }
-        mListener.onLocationChanged(p0)
     }
     override fun onRegeocodeSearched(p0: RegeocodeResult?, p1: Int) {
         mListener.onRegeocodeSearched(p0,p1)
@@ -404,23 +383,21 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
     }
 
     override fun onLocationChange(p0: AMapNaviLocation?) {
-
+        L.i("AMapNavilistener onLocationChange ${p0?.coord?.latitude},${p0?.coord?.longitude}")
     }
 
     override fun onGetNavigationText(p0: Int, p1: String?) {
-
+        L.i("AMapNavilistener onGetNavigationText $p0 $p1")
     }
 
     override fun onArriveDestination(p0: Boolean) {
-        TODO("Not yet implemented")
+
     }
 
     override fun onStartNavi(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onTrafficStatusUpdate() {
-        TODO("Not yet implemented")
     }
 
     override fun onCalculateRouteSuccess(p0: IntArray?) {
@@ -432,59 +409,45 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
     }
 
     override fun notifyParallelRoad(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun OnUpdateTrafficFacility(p0: Array<out AMapNaviTrafficFacilityInfo>?) {
-        TODO("Not yet implemented")
     }
 
     override fun OnUpdateTrafficFacility(p0: AMapNaviTrafficFacilityInfo?) {
-        TODO("Not yet implemented")
     }
 
     override fun updateAimlessModeStatistics(p0: AimLessModeStat?) {
-        TODO("Not yet implemented")
     }
 
     override fun updateAimlessModeCongestionInfo(p0: AimLessModeCongestionInfo?) {
-        TODO("Not yet implemented")
     }
 
     override fun onPlayRing(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onNaviRouteNotify(p0: AMapNaviRouteNotifyData?) {
-        TODO("Not yet implemented")
     }
 
     override fun onGpsSignalWeak(p0: Boolean) {
-        TODO("Not yet implemented")
     }
 
     override fun onCalculateRouteFailure(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onCalculateRouteFailure(p0: AMapCalcRouteResult?) {
-        TODO("Not yet implemented")
     }
 
     override fun onReCalculateRouteForYaw() {
-        TODO("Not yet implemented")
     }
 
     override fun onReCalculateRouteForTrafficJam() {
-        TODO("Not yet implemented")
     }
 
     override fun onStopSpeaking() {
-        TODO("Not yet implemented")
     }
 
     override fun onReCalculateRoute(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onExitPage(p0: Int) {
@@ -495,23 +458,18 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
     }
 
     override fun onStrategyChanged(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onArrivedWayPoint(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onGpsOpenStatus(p0: Boolean) {
-        TODO("Not yet implemented")
     }
 
     override fun onNaviInfoUpdate(p0: NaviInfo?) {
-        TODO("Not yet implemented")
     }
 
     override fun updateCameraInfo(p0: Array<out AMapNaviCameraInfo>?) {
-        TODO("Not yet implemented")
     }
 
     override fun updateIntervalCameraInfo(
@@ -519,71 +477,59 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
         p1: AMapNaviCameraInfo?,
         p2: Int
     ) {
-        TODO("Not yet implemented")
     }
 
     override fun onServiceAreaUpdate(p0: Array<out AMapServiceAreaInfo>?) {
-        TODO("Not yet implemented")
     }
 
     override fun showCross(p0: AMapNaviCross?) {
-        TODO("Not yet implemented")
     }
 
     override fun hideCross() {
-        TODO("Not yet implemented")
     }
 
     override fun showModeCross(p0: AMapModelCross?) {
-        TODO("Not yet implemented")
     }
 
     override fun hideModeCross() {
-        TODO("Not yet implemented")
     }
 
     override fun showLaneInfo(p0: Array<out AMapLaneInfo>?, p1: ByteArray?, p2: ByteArray?) {
-        TODO("Not yet implemented")
     }
 
     override fun showLaneInfo(p0: AMapLaneInfo?) {
-        TODO("Not yet implemented")
     }
 
     override fun hideLaneInfo() {
-        TODO("Not yet implemented")
     }
 
     override fun onMapTypeChanged(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onNaviDirectionChanged(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onDayAndNightModeChanged(p0: Int) {
-        TODO("Not yet implemented")
+        Log.i("TAG","")
     }
 
     override fun onBroadcastModeChanged(p0: Int) {
-        TODO("Not yet implemented")
     }
 
     override fun onScaleAutoChanged(p0: Boolean) {
         TODO("Not yet implemented")
     }
 
-    override fun getCustomMiddleView(): View {
-        TODO("Not yet implemented")
+    override fun getCustomMiddleView(): View? {
+        return null
     }
 
-    override fun getCustomNaviView(): View {
-        TODO("Not yet implemented")
+    override fun getCustomNaviView(): View? {
+        return null
     }
 
-    override fun getCustomNaviBottomView(): View {
-        TODO("Not yet implemented")
+    override fun getCustomNaviBottomView(): View? {
+        return null
     }
 
     override fun getInfoWindow(p0: Marker?): View? {
@@ -593,6 +539,4 @@ object GDMapManager :AMapLocationListener, GeocodeSearch.OnGeocodeSearchListener
     override fun getInfoContents(p0: Marker?): View {
         return mListener.getInfoContents(p0)
     }
-
-
 }

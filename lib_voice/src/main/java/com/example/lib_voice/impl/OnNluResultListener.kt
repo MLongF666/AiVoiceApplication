@@ -20,10 +20,10 @@ interface OnNluResultListener {
     //返回
     fun back()
     //主页
-    fun home(): Any?
-    fun setVolumeUp(): Any?
-    fun setVolumeDown(): Any?
-    fun quit(): Any?
+    fun home()
+    fun setVolumeUp()
+    fun setVolumeDown()
+    fun quit()
     //按照名字拨打电话
     fun callPhoneForName(name: String)
     //按照号码拨打电话
@@ -34,7 +34,9 @@ interface OnNluResultListener {
     fun jokeList()
     fun conTellTime(word: String)
     fun conTellInfo(word: String)
+    //规划-导航
     fun routeMap(word: String)
+    //周边搜索
     fun nearByMap(word: String)
     fun aiRobot(string: String)
 
