@@ -63,6 +63,10 @@ android {
 dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
     implementation(project(":lib_base"))
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
 //    implementation(libs.androidx.appcompat)
 //    implementation(libs.material)
 //    implementation(libs.androidx.activity)

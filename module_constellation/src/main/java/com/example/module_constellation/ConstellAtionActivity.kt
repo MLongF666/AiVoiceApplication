@@ -84,8 +84,6 @@ class ConstellAtionActivity : BaseActivity<ActivityConstellBinding>() {
         val weekFragment = WeekFragment.newInstance(cid)
         val monthFragment = MonthFragment.newInstance(cid)
         val yearFragment = YearFragment.newInstance(cid)
-
-
         mFragments.add(todayFragment)
         mFragments.add(tomorrowFragment)
         mFragments.add(weekFragment)
