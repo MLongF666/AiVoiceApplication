@@ -34,7 +34,7 @@ class PointLayoutView:LinearLayout {
             mListImageView.clear()
         }
         for (i in 0 until count){
-            var imageView = ImageView(context)
+            val imageView = ImageView(context)
             addView(imageView)
             mListImageView.add(imageView)
         }

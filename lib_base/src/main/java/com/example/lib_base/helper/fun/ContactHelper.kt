@@ -14,6 +14,7 @@ import com.example.lib_base.utils.L
  * @date: 2024/7/21 9:57
  * @version: 1.0
  */
+@SuppressLint("StaticFieldLeak")
 object ContactHelper {
     private lateinit var mContext: Context
 //    const val PHONE_URI = "content://com.android.contacts/contacts"

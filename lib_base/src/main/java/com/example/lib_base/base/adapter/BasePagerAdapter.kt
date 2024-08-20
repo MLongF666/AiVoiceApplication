@@ -8,11 +8,7 @@ import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 
 
-/**
- * FileName: BasePagerAdapter
- * Founder: LiuGuiLin
- * Profile:
- */
+
 class BasePagerAdapter(private val mList: List<View>) : PagerAdapter() {
     private val TAG = "BasePagerAdapter"
     override fun isViewFromObject(view: View, `object`: Any): Boolean {

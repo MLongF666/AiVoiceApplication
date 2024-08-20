@@ -3,9 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
     <!--4 x 6 宫格-->
-
     <!--第一行-->
     <LinearLayout
         android:layout_width="match_parent"

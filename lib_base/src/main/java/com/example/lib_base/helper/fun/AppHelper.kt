@@ -1,5 +1,6 @@
 package com.example.lib_base.helper.`fun`
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -19,6 +20,7 @@ import com.example.lib_base.utils.L
  * Founder:
  * Profile: 应用帮助类
  */
+@SuppressLint("StaticFieldLeak")
 object AppHelper {
 
     //上下文
