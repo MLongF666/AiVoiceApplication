@@ -512,7 +512,6 @@ class VoiceService : Service(), OnNluResultListener {
             }catch (e: Exception){
                 e.printStackTrace()
             }
-
         }
     }
 }

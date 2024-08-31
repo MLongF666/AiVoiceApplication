@@ -56,14 +56,11 @@ class CitySelectView: View {
     private fun initView(){
         //抗锯齿
         paint.isAntiAlias = true
-
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         drawCity(canvas)
-
-
     }
 
 
@@ -91,8 +88,6 @@ class CitySelectView: View {
         }
     }
 
-
-
     //设置数据源
     fun setCityList(list: List<String>){
         if (mList.size>0){
@@ -101,7 +96,6 @@ class CitySelectView: View {
         mList.addAll(list)
         invalidate()
     }
-
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
             when(it.action){
@@ -128,7 +122,6 @@ class CitySelectView: View {
                 else -> {}
             }
         }
-
         return super.dispatchTouchEvent(event)
     }
     //===================OpenImpl=========================

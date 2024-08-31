@@ -66,7 +66,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
     }
     override fun initData() {
         val arrayMainTitles = resources.getStringArray(com.example.lib_base.R.array.MainTitleArray)
-
         arrayMainTitles.forEach {
             arrayList.add(it)
         }
@@ -220,9 +219,7 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
             val binder = p1 as VoiceService.LocalBinder
             mVoiceService = binder.getService()
             mVoiceService?.setOnVoiceListener(this@MainActivity)
-
         }
-
     }
     override fun onVolumeChanged(volume: Int) {
         L.d("onVolumeChanged MainActivity: $volume")

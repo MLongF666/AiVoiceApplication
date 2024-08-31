@@ -77,22 +77,15 @@ class CityActivity : BaseActivity<ActivityCityBinding>() {
         if (mList.size>0){
             mList.forEachIndexed { index, citySelectData ->
                 if (value==citySelectData.title){
-
                     getBinding().cityList.scrollToPosition(index)
                     return@forEachIndexed
                 }
-
             }
-
         }
-
     }
-
     override fun initData() {
         val city = AssetUtils.getCity()
         initCityList(city)
-
-
     }
 
     private val mListTitle = ArrayList<String>()
