@@ -168,7 +168,6 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
 
                     "天气" -> {
                         ARouterHelper.startActivity(ARouterHelper.PATH_WEATHER)
-                        //
                     }
 
                     "星座" -> {
