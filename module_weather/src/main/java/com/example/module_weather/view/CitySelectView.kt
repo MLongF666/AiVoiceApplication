@@ -1,10 +1,12 @@
 package com.example.module_weather.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 
@@ -15,6 +17,7 @@ import android.view.View
  * @version: 1.0
  */
 class CitySelectView: View {
+    private val TAG:String = "CitySelectView"
     //view高
     private var viewHeight: Int = 0
 
@@ -96,6 +99,11 @@ class CitySelectView: View {
         mList.addAll(list)
         invalidate()
     }
+
+    @SuppressLint("ClickableViewAccessibility")
+	override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return super.onTouchEvent(event)
+    }
     override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
         event?.let {
             when(it.action){
@@ -106,6 +114,9 @@ class CitySelectView: View {
                     //这里做处理
                     //当手指按下去的时候 如何计算选中的下标
                     val oldIndex=selectIndex
+                    Log.i(TAG,"oldIndex:${event.y}")
+                    Log.i(TAG,"viewHeight:$viewHeight")
+                    Log.i(TAG,"size:${mList.size}")
                     val check=event.y/viewHeight*mList.size
                     if (oldIndex!=check.toInt()){
                         mListener?.valueInput(mList[check.toInt()])

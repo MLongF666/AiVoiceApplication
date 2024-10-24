@@ -9,6 +9,7 @@ import android.media.MediaRecorder
 import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,7 +19,7 @@ import com.airbnb.lottie.LottieAnimationView
 import com.example.aivoiceapplication.R
 import com.example.aivoiceapplication.adapter.ChatListAdapter
 import com.example.aivoiceapplication.data.ChatListData
-import com.example.aivoiceapplication.entity.AppConstants
+import com.example.lib_base.entity.AppConstants
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.helper.InputKeyHelper
 import com.example.lib_base.helper.InputKeyHelper.execByRuntime
@@ -30,6 +31,7 @@ import com.example.lib_base.helper.`fun`.CommonSettingHelper
 import com.example.lib_base.helper.`fun`.ConsTellHelper
 import com.example.lib_base.helper.`fun`.ContactHelper
 import com.example.lib_base.utils.L
+import com.example.lib_base.utils.SpUtil
 import com.example.lib_network.HttpManager
 import com.example.lib_network.bean.AiRootBean
 import com.example.lib_network.bean.JokeDataBean
@@ -99,7 +101,16 @@ class VoiceService : Service(), OnNluResultListener {
         VoiceManager.initManager(this,getExternalFilesDir("msc")?.absolutePath + "/ivw.wav" ,object : OnAsrResultListener {
             //准备就绪
             override fun weakUpReady() {
-                VoiceManager.ttsStart("唤醒引擎准备就绪")
+                val isOpen = SpUtil.get(AppConstants.IS_OPEN_VOICE_SPEECH, false)
+                isOpen.let {
+                    if (it as Boolean){
+                        VoiceManager.ttsStart("欢迎使用AI语音助手")
+                        Log.d("TAG", "weakUpReady: $isOpen")
+                    }else{
+                        return
+                    }
+                }
+
             }
 
             override fun asrStartSpeak() {

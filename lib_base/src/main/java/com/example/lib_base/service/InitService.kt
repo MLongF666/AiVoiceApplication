@@ -42,7 +42,6 @@ class InitService : IntentService(InitService::class.simpleName) {
         CommonSettingHelper.initHelper(this)
         ConsTellHelper.initHelper(this)
         AssetUtils.initUtils(this)
-
         L.i("执行初始化操作")
     }
 

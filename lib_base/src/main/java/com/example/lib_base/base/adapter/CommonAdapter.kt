@@ -60,7 +60,7 @@ open class CommonAdapter<T> : RecyclerView.Adapter<CommonViewHolder> {
         return 0
     }
     interface OnBindDataListener<T> {
-       fun onBindViewHolder(model:T,viewHolder:CommonViewHolder,type:Int,position:Int)
+       fun onBindViewHolder(mdel:T,viewHolder:CommonViewHolder,type:Int,position:Int)
        fun getLayoutId(type:Int):Int
     }
     interface OnMoreBindDataListener<T>:OnBindDataListener<T> {

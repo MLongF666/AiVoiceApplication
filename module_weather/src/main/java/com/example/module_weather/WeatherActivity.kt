@@ -125,8 +125,11 @@ class WeatherActivity : BaseActivity<ActivityWeatherBinding>() {
                             val data = ArrayList<Entry>()
                             //绘制图表
                             it.result.future.forEachIndexed{index, future->
-                                val temp = future.temperature.substring(0, 2)
-                                data.add(Entry((index+1).toFloat(),temp.toFloat()))
+                                var temp = future.temperature.substring(0, 2)
+                                if (temp.contains("/")){
+                                    temp=temp.replace("/","")
+                                }
+                                data.add(Entry((index + 1).toFloat(),temp.toFloat()))
                             }
                             setLineChartData(data)
                         }

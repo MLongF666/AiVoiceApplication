@@ -79,6 +79,9 @@ object GDMapManager : GeocodeSearch.OnGeocodeSearchListener, INaviInfoCallback,
     private var query:PoiSearchV2.Query?=null
     //绑定地图视图
     fun bindMapView(mMapView: MapView, bundle: Bundle?,mContext: Context){
+        //TODO 定位合规检查
+        AMapLocationClient.updatePrivacyShow(mContext,true,true)
+        AMapLocationClient.updatePrivacyAgree(mContext,true)
         GDMapManager.mMapView = mMapView
         L.i("mMap init success")
         GDMapManager.mMapView!!.onCreate(bundle)
@@ -89,9 +92,6 @@ object GDMapManager : GeocodeSearch.OnGeocodeSearchListener, INaviInfoCallback,
     }
     //初始化定位
     private fun initMapLocation(mContext: Context){
-        //TODO 定位合规检查
-        AMapLocationClient.updatePrivacyShow(mContext,true,true)
-        AMapLocationClient.updatePrivacyAgree(mContext,true)
         option = AMapLocationClientOption()
         /**
          * 设置定位场景，目前支持三种场景（签到、出行、运动，默认无场景）

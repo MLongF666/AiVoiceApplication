@@ -8,6 +8,7 @@ import android.content.ServiceConnection
 import android.media.AudioManager
 import android.os.Handler
 import android.os.IBinder
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -104,6 +105,15 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
         }
         initPageData()
         initPageView()
+    }
+
+
+    override fun requestOk(){
+        linkService()
+    }
+
+    override fun requestFail() {
+        Toast.makeText(this, "权限申请失败", Toast.LENGTH_SHORT).show()
     }
 
     private fun initPageView() {
@@ -207,6 +217,8 @@ class MainActivity : BaseActivity<ActivityMainBinding>(),VolumeChangeObserver.Vo
         }
     }
     private fun linkService() {
+        val TAG = "MainActivity"
+        Log.d(TAG,"linkService")
         ContactHelper.init(this)
         val intent = Intent(this, VoiceService::class.java)
         startService(intent)

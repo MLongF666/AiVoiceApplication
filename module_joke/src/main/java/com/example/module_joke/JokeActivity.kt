@@ -1,32 +1,26 @@
 package com.example.module_joke
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.example.lib_base.base.BaseActivity
 import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
-import com.example.lib_base.base.impl.OnItemClick
+import com.example.lib_base.entity.AppConstants
 import com.example.lib_base.helper.ARouterHelper
 import com.example.lib_base.utils.L
+import com.example.lib_base.utils.SpUtil
 import com.example.lib_network.HttpManager
 import com.example.lib_network.bean.Item
 import com.example.lib_network.bean.JokeDataBean
-import com.example.lib_network.bean.JokeResult
 import com.example.lib_voice.manager.VoiceManager
 import com.example.lib_voice.tts.VoiceTTs
 import com.example.module_joke.databinding.ActivityJokeBinding
 import com.scwang.smart.refresh.footer.BallPulseFooter
-import com.scwang.smart.refresh.footer.ClassicsFooter
-import com.scwang.smart.refresh.header.ClassicsHeader
 import com.scwang.smart.refresh.header.MaterialHeader
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.constant.SpinnerStyle
-import com.scwang.smart.refresh.layout.listener.OnLoadMoreListener
-import com.scwang.smart.refresh.layout.listener.OnRefreshListener
-import kotlinx.coroutines.selects.whileSelect
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -60,37 +54,39 @@ class JokeActivity : BaseActivity<ActivityJokeBinding>(){
         mJokeList = ArrayList<Item>()
         rvJokeList = getBinding().rvJokeList
         rvJokeList.layoutManager = LinearLayoutManager(this)
-        mJokeAdapter = CommonAdapter(mJokeList,object : CommonAdapter.OnBindDataListener<Item> {
+        mJokeAdapter = CommonAdapter(mJokeList,object : CommonAdapter.OnMoreBindDataListener<Item> {
             override fun onBindViewHolder(
-                model: Item,
+                mdel: Item,
                 viewHolder: CommonViewHolder,
                 type: Int,
                 position: Int
             ) {
                 val textView = viewHolder.getView<TextView>(R.id.tv_joke)
-                textView.text = model.content
+                textView.text = mdel.content
                 val imageButton = viewHolder.getView<ImageButton>(R.id.btn_switch)
                 imageButton.setOnClickListener {
                     if (imageButton.isSelected&&currentPlayIndex == position){
-//                        Toast.makeText(this@JokeActivity,"已关闭语音",Toast.LENGTH_SHORT).show()
                         VoiceManager.ttsPause()
                         currentPlayIndex = -1
                     }else{
                         val oldIndex = currentPlayIndex
                         currentPlayIndex = position
                         VoiceManager.ttsStop()
-//                        Toast.makeText(this@JokeActivity,"已开启语音",Toast.LENGTH_SHORT).show()
-                        VoiceManager.ttsStart(model.content,object : VoiceTTs.OnTTSResultListener{
+                        VoiceManager.ttsStart(mdel.content,object : VoiceTTs.OnTTSResultListener{
                             override fun onTTEnd() {
                                 currentPlayIndex = -1
                                 imageButton.isSelected = false
                             }
-
                         })
                         mJokeAdapter.notifyItemChanged(oldIndex)
                     }
                     imageButton.isSelected = !imageButton.isSelected
                 }
+
+            }
+
+            override fun getItemViewType(position: Int): Int {
+                return position
             }
 
             override fun getLayoutId(type: Int): Int {
@@ -108,7 +104,15 @@ class JokeActivity : BaseActivity<ActivityJokeBinding>(){
 
     override fun onDestroy() {
         super.onDestroy()
-        VoiceManager.ttsPause()
+        val isPlay = SpUtil.get(AppConstants.IS_JOKE_BACKEND_PLAY, false)
+        isPlay.let {
+            if (isPlay as Boolean){
+                return
+            }else{
+                VoiceManager.ttsPause()
+            }
+        }
+
     }
 
     override fun isShowBack(): Boolean {

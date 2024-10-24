@@ -31,7 +31,7 @@ object WindowsHelper {
             this.width = WindowManager.LayoutParams.MATCH_PARENT
             this.height = WindowManager.LayoutParams.MATCH_PARENT
             gravity = Gravity.CENTER
-            format = PixelFormat.TRANSLUCENT
+            format = PixelFormat.TRANSPARENT
             flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL or
                     WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or

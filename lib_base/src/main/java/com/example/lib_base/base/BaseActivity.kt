@@ -121,6 +121,27 @@ abstract class BaseActivity<T: ViewBinding > : AppCompatActivity() {
                 .start()
         }
     }
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode==WINDOW_PERMISSION){
+            if(checkWindowPermission()){
+                //权限通过
+                requestOk()
+            }else{
+                //权限未通过
+                requestFail()
+            }
+        }
+    }
+
+    open fun requestFail() {
+
+    }
+
+    open fun requestOk() {
+
+    }
 
 
 }

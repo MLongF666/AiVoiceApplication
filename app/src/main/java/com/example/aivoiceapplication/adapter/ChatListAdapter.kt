@@ -4,7 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.aivoiceapplication.R
 import com.example.aivoiceapplication.data.ChatListData
-import com.example.aivoiceapplication.entity.AppConstants
+import com.example.lib_base.entity.AppConstants
 import com.example.lib_base.base.adapter.CommonAdapter
 import com.example.lib_base.base.adapter.CommonViewHolder
 import com.example.module_weather.tools.WeatherIconTools

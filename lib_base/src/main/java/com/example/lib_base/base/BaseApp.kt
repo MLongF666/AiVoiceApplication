@@ -9,6 +9,7 @@ import com.example.lib_base.helper.NotificationHelper
 import com.example.lib_base.service.InitService
 import com.example.lib_base.utils.CommonUtils
 import com.example.lib_base.utils.L
+import com.example.lib_base.utils.SpUtil
 
 open class BaseApp : Application() {
     override fun onCreate() {
@@ -33,6 +34,7 @@ open class BaseApp : Application() {
         } else {
             startService(Intent(this, InitService::class.java))
         }
+
 
     }
 }
